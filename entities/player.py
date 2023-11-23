@@ -1,5 +1,5 @@
 import pygame
-from shot import Shot
+from entities.shot import Shot
 from pygame.locals import *
 
 class Player():  
