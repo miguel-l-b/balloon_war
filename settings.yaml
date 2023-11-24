@@ -5,9 +5,11 @@ window:
   fullScreen: false
 # paths of imports assets and scripts
 paths:
-  assets: assets
+  assets:  assets
   sprites: assets/sprites
-  scenes: scenes
+  scripts: assets/scripts
+  audio:   assets/audio
+  scenes:  scenes
 # settings of game
 game:
   frameRate: 24
