@@ -32,6 +32,8 @@ class ResolverPath:
 
   @staticmethod
   def resolve(path: str):
+    if path.find("@") == -1:
+      return path
     paths = ResolverConfig.resolve()["paths"]
     for key in paths:
       path = path.replace(f"@{key}", paths[key])
