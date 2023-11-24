@@ -1,7 +1,11 @@
 from time import sleep
 import pygame
+from pygame.locals import *
+from entities.player import Player
+from entities.shot import Shot
 
 from entities.player import Player
+from pygame import *
 
 
 class testGame:
@@ -10,9 +14,9 @@ class testGame:
 
   objects = []
 
-  font_HUD_player = pygame.font.SysFont("Arial", 50)
-  font_HUD_points = pygame.font.SysFont("Arial", 30)
-  font_show_info = pygame.font.SysFont("Arial", 10)
+  # font_HUD_player = pygame.font.SysFont("Arial", 50)
+  # font_HUD_points = pygame.font.SysFont("Arial", 30)
+  # font_show_info = pygame.font.SysFont("Arial", 10)
 
   circle = {"x": 50, "y": 50, "direction": "right", "radius": 20}
 
@@ -27,24 +31,25 @@ class testGame:
   p1_shots = []
   p2_shots = []
 
-  font = pygame.font.SysFont("Courier New", 24)
+  # font = pygame.font.SysFont("Courier New", 24)
 
   def __init__(self):
     pass
 
-  def render_objects(self, screen):
+
+  def render_objects(self, screen: Surface):
     screen.fill((255, 255, 255))
 
-    p1_hp_display = font.render(f"Cyan's HP: {p1.hp}", True, (93, 133, 245))
-    p2_hp_display = font.render(f"Oranges's HP: {p2.hp}", True, (222, 119, 51))
+    # p1_hp_display = font.render(f"Cyan's HP: {p1.hp}", True, (93, 133, 245))
+    # p2_hp_display = font.render(f"Oranges's HP: {p2.hp}", True, (222, 119, 51))
 
-    screen.blit(p1_hp_display, (300, 10))
-    screen.blit(p2_hp_display, (10, 10))
+    # screen.blit(p1_hp_display, (300, 10))
+    # screen.blit(p2_hp_display, (10, 10))
 
-    for player in players:
+    for player in testGame.players:
       pygame.draw.circle(screen, player.color, player.coords, 40)
 
-    for shot in p1.shots:
+    for shot in testGame.p1.shots:
       if (p2.isInHitBox(shot.coords)):
         p2.hp -= 10
         p1.shots.remove(shot)
@@ -55,7 +60,7 @@ class testGame:
         pygame.draw.circle(screen, shot.color, shot.coords, shot.radius)
         shot.coords = (shot.coords[0] - shot.speed, shot.coords[1])
 
-    for shot in p2.shots:
+    for shot in testGame.p2.shots:
       if (p1.isInHitBox(shot.coords)):
         p1.hp -= 10
         p2.shots.remove(shot)
@@ -65,12 +70,12 @@ class testGame:
         pygame.draw.circle(screen, shot.color, shot.coords, shot.radius)
         shot.coords = (shot.coords[0] + shot.speed, shot.coords[1])
           
-  def start(self):
-    while status:
-      self.render_objects()
+  def start(self, screen: Surface):
+    while testGame.status:
+      self.render_objects(screen)
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
-          status = False
+          testGame.status = False
         
         if event.type == pygame.KEYDOWN:
           if event.key == pygame.K_UP:
