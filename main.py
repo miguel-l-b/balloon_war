@@ -1,8 +1,5 @@
 import pygame
-from time import sleep
 from pygame.locals import *
-from entities.player import Player
-from entities.shot import Shot
 from core.resolver import ResolverConfig, ResolverFile, ResolverPath
 import importlib.util
 
@@ -19,7 +16,6 @@ for scene in ResolverFile.getAllFiles("@scenes"):
       modulo = importlib.util.module_from_spec(spec)
       spec.loader.exec_module(modulo)
 
-      # Agora, você pode usar o módulo normalmente
       modulo.start(screen)
       break
 
