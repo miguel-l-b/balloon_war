@@ -4,6 +4,7 @@ from core.resolver import ResolverConfig, ResolverFile, ResolverPath
 import importlib.util
 
 pygame.init()
+pygame.mixer.init()
 pygame.display.set_caption(ResolverConfig.resolve()["window"]["title"])
 screen = pygame.display.set_mode(
   ResolverConfig.resolve()["window"]["dimension"],
@@ -20,8 +21,7 @@ for scene in ResolverFile.getAllFilesWithExtension("@scenes", ".py"):
     )
     modulo = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(modulo)
-
-    # Agora, você pode usar o módulo normalmente
+    
     modulo.start(screen)
     break
 
