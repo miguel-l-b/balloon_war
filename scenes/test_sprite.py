@@ -1,17 +1,45 @@
 import pygame
 from pygame import *
 from pygame.locals import *
-from core.sprite import SpriteSlicer
+from core.resolver import ResolverConfig
+from core.sprite import SpriteAnimation, SpriteSlicer
 
 class TestSpriteScene():
   def __init__(self, screen: Surface) -> None:
     self.screen = screen
-    self.sprite = SpriteSlicer("@sprites/balloon_orange.png", {"width": 40, "height": 40, "rows": 11, "columns": 1}, 11)
-    self.__vez = 0
+    self.sprite = [
+      SpriteAnimation(
+        SpriteSlicer("@sprites/balloon_orange.png", {"width": 40, "height": 40, "rows": 11, "columns": 1}).getAll(),
+        15
+      ),
+      SpriteAnimation(
+        SpriteSlicer("@sprites/balloon_cyan.png", {"width": 40, "height": 40, "rows": 11, "columns": 1}).getAll(),
+        15
+      ),
+      SpriteAnimation(
+        SpriteSlicer("@sprites/explode_balloon_orange.png", {"width": 40, "height": 40, "rows": 8, "columns": 1}).getAll(),
+        15
+      ),
+      SpriteAnimation(
+        SpriteSlicer("@sprites/explode_balloon_cyan.png", {"width": 40, "height": 40, "rows": 8, "columns": 1}).getAll(),
+        15
+      ),
+      SpriteAnimation(
+        SpriteSlicer("@sprites/explode_balloon_orange.png", {"width": 40, "height": 40, "rows": 8, "columns": 1}).getAll(),
+        15
+      ),
+    ]
+    self.__limitFPS = ResolverConfig.resolve()["game"]["frameRate"]
 
   def draw(self):
     self.screen.fill((255, 255, 255))
-    self.screen.blit(self.sprite.get(self.__vez), (0, 0))
+    for i in self.sprite:
+      self.screen.blit(
+        pygame.transform.scale(
+          i.update(1/self.__limitFPS), (80, 80)
+        ),
+        (80*self.sprite.index(i), 0)
+      )
 
   def loop(self):
     while True:
@@ -21,13 +49,8 @@ class TestSpriteScene():
         if event.type == QUIT:
           pygame.quit()
           exit()
-
-      self.__vez += 1
-      if self.__vez > 10:
-        self.__vez = 0
-
       
-      pygame.time.Clock().tick(60)
+      pygame.time.Clock().tick(self.__limitFPS)
  
 def start(screen: Surface):
   TestSpriteScene(screen).loop()
