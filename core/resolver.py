@@ -1,29 +1,36 @@
 from typing import TypedDict
 import yaml
 import os
+import core.types as types
 
-class TSettingsGame(TypedDict):
-  frameRate: int
-  mainScene: str
-class TSettingsWindow(TypedDict):
-  title: str
-  dimension: "tuple[int, int]"
-  fullScreen: bool
-class TSettings(TypedDict):
-  paths: "dict[str, str]"
-  window: TSettingsWindow
-  game: TSettingsGame
 class ResolverConfig:
-  __settings: TSettings = None
+  __settings: types.TSettings = None
   def __init__(self):
     pass
 
   @staticmethod
-  def resolve() -> TSettings:
+  def resolve() -> types.TSettings:
     if(ResolverConfig.__settings is None):
       ResolverConfig.__settings = ResolverFile.readYaml(f"{ResolverPath.getLocalPath()}/settings.yaml")
     
     return ResolverConfig.__settings
+
+
+class ResolverCoords:
+  def __init__(self):
+    pass
+
+  @staticmethod
+  def getCoordsWithCenter(screenSize: types.TCoord, size: types.TSize) -> types.TCoord:
+    return (screenSize[0]/2 - size[0]/2, screenSize[1]/2 - size[1]/2)
+  
+  @staticmethod
+  def getCoordsWithCenterX(screenSize: types.TCoord, size: types.TSize) -> types.TCoord:
+    return (screenSize[0]/2 - size[0]/2, size[1])
+  
+  @staticmethod
+  def getCoordsWithCenterY(screenSize: types.TCoord, size: types.TSize) -> types.TCoord:
+    return (size[0], screenSize[1]/2 - size[1]/2)
 
 
 class ResolverPath:
