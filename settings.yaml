@@ -1,0 +1,6 @@
+paths:
+  assets: "assets"
+  sprites: "assets/sprites"
+  scenes: "scenes"
+
+mainScene: "test_sprite"
