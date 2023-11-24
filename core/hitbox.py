@@ -1,13 +1,12 @@
-from typing import TypedDict
 import pygame
 import core.types as types
 from core.resolver import ResolverPath 
-
 
 class HitboxSprite:
     def __init__(self, path: str, color: "tuple[int, int, int]" = (255, 0, 0), tolerance: int = 0):
         self.__path = ResolverPath(path)
         self.__color = color
+        self.__tolerance = tolerance
 
     @property
     def path(self):
@@ -28,7 +27,6 @@ class HitboxSprite:
                     pixels.append((x, y))
         return pixels
     
-
     def __str__(self):
         return f"{self.__path}@{self.__color}"
 

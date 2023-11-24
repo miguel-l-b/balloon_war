@@ -1,5 +1,3 @@
-from enum import Enum
-
 from pygame import Surface
 import pygame
 from core.resolver import ResolverConfig

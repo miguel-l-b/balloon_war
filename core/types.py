@@ -1,7 +1,6 @@
 from enum import Enum
 from typing import NewType, TypedDict
 
-
 class TSettingsGame(TypedDict):
   frameRate: int
   mainScene: str

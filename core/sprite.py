@@ -10,7 +10,7 @@ class SpriteSlicer:
         self.__amount = self.__dimensions["rows"] * self.__dimensions["columns"]
       else:
         self.__amount = stopWithSprite
-      self.__sprites: list[pygame.Surface] = []
+      self.__frames: list[pygame.Surface] = []
       self.__resize = resize
       self.__load()
 
@@ -44,7 +44,7 @@ class SpriteSlicer:
           else:
               raise Exception("SpriteSlicer: The amount of sprites is greater than or equal to the amount of rows and columns.")
           if self.__resize != None:
-            self.__sprites.append(
+            self.__frames.append(
               pygame.transform.scale(
                 image.subsurface(
                     pygame.Rect(
@@ -58,7 +58,7 @@ class SpriteSlicer:
               )
             )
           else:
-            self.__sprites.append(
+            self.__frames.append(
               image.subsurface(
                   pygame.Rect(
                       columns * self.__dimensions["width"],
@@ -70,9 +70,9 @@ class SpriteSlicer:
             )
         
     def getAll(self) -> "list[pygame.Surface]":
-      return self.__sprites
+      return self.__frames
     
     def get(self, index: int) -> pygame.Surface:
-      if(index < 0 or index > len(self.__sprites)-1):
+      if(index < 0 or index > len(self.__frames)-1):
         raise Exception("SpriteSlicer: The index is greater than the amount of sprites.")
-      return self.__sprites[index]
+      return self.__frames[index]
