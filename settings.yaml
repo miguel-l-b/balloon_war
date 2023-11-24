@@ -1,6 +1,14 @@
+# setting windows
+window:
+  title: Balloon War
+  dimension: !!python/tuple [500, 800]
+  fullScreen: false
+# paths of imports assets and scripts
 paths:
-  assets: "assets"
-  sprites: "assets/sprites"
-  scenes: "scenes"
-
-mainScene: "test_sprite"
+  assets: assets
+  sprites: assets/sprites
+  scenes: scenes
+# settings of game
+game:
+  frameRate: 24
+  mainScene: test_sprite
