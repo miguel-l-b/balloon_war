@@ -1,5 +1,5 @@
 import pygame
-from entities.hitbox import Hitbox
+from core.hitbox import Hitbox
 class Shot():
     def __init__(self, color: pygame.color, initialCoords = (0, 0), radius: float = 10, speed: int = 10):
         self.__color = color

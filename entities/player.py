@@ -1,9 +1,9 @@
 import pygame
 from entities.shot import Shot
-from entities.hitbox import Hitbox
+from core.hitbox import Hitbox
 from pygame.locals import *
 
-class Player():  
+class Player:  
   def __init__(self, name: str, color: pygame.Color, initialCoords = (0, 0), hp: int = 100, size: int = 40, speed: int = 20):
     self.__alive = True
     self.__hp = hp
