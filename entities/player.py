@@ -5,6 +5,7 @@ from pygame.locals import *
 
 class Player():  
   def __init__(self, name: str, color: pygame.Color, initialCoords = (0, 0), hp: int = 100, size: int = 40, speed: int = 20):
+    self.__alive = True
     self.__hp = hp
     self.__name = name
     self.__color = color
@@ -13,7 +14,15 @@ class Player():
     self.__speed = speed
     self.__hitbox = Hitbox(self.__coords, self.__size)
     self.__shots = []
-  
+    
+  @property
+  def alive(self):
+    return self.__alive
+
+  @alive.setter
+  def alive(self, newAlive):
+    self.__alive = newAlive
+
   @property
   def coords(self):
     return self.__coords
@@ -37,6 +46,14 @@ class Player():
   @hp.setter
   def hp(self, newHp):
     self.__hp = newHp
+
+  @property
+  def size(self):
+    return self.__size
+
+  @size.setter
+  def size(self, newSize):
+    self.__size = newSize
 
   @property
   def speed(self):
@@ -77,3 +94,8 @@ class Player():
       return self.__shots.index(shot)
     except:
       return -1
+  
+  def die(self):
+    self.__alive = False
+    self.__size = 0
+    self.__hitbox = None
