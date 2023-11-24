@@ -1,17 +1,28 @@
 import pygame
 from entities.shot import Shot
+from entities.hitbox import Hitbox
 from pygame.locals import *
 
 class Player():  
-  def __init__(self, name: str, color: pygame.Color, initialCoords = (0, 0), hp: int = 100, shape: str = "snake", hitbox = (40, 40)):
+  def __init__(self, name: str, color: pygame.Color, initialCoords = (0, 0), hp: int = 100, size: int = 40, speed: int = 20):
+    self.__alive = True
     self.__hp = hp
     self.__name = name
     self.__color = color
     self.__coords = initialCoords
-    self.__shape = shape
-    self.shots = []
-    self.__hitbox = pygame.Rect(self.__coords[0], self.__coords[1], hitbox[0], hitbox[1])
-  
+    self.__size = size
+    self.__speed = speed
+    self.__hitbox = Hitbox(self.__coords, self.__size)
+    self.__shots = []
+    
+  @property
+  def alive(self):
+    return self.__alive
+
+  @alive.setter
+  def alive(self, newAlive):
+    self.__alive = newAlive
+
   @property
   def coords(self):
     return self.__coords
@@ -36,17 +47,55 @@ class Player():
   def hp(self, newHp):
     self.__hp = newHp
 
-  def isInHitBox(self, coords):
-    return (coords[0] == self.__coords[0] + 40 or 
-            coords[0] == self.__coords[0] - 40 or 
-            coords[1] == self.__coords[1] + 40 or 
-            coords[1] == self.__coords[1] - 40)
+  @property
+  def size(self):
+    return self.__size
 
-  def moveUp(self, distance):
-    self.__coords = (self.__coords[0], self.__coords[1] - distance)
+  @size.setter
+  def size(self, newSize):
+    self.__size = newSize
+
+  @property
+  def speed(self):
+    return self.__speed
+
+  @speed.setter
+  def speed(self, newSpeed):
+    self.__speed = newSpeed
+
+  @property
+  def shots(self):
+    return self.__shots
   
-  def moveDown(self, distance):
-    self.__coords = (self.__coords[0], self.__coords[1] + distance)
+  @shots.setter
+  def shots(self, newShots):
+    self.__shots = newShots
 
-  def shoot(self, color: pygame.Color, radius: float = 10, speed: int = 10):
-    self.shots.append(Shot(color, self.__coords, radius, speed))
+  def hit(self, coords) -> bool:
+    return self.__hitbox.hit(coords)
+
+  def moveUp(self, distance: int = 0):
+    if (distance == 0): 
+      distance = self.__speed
+    self.__coords = (self.__coords[0], self.__coords[1] - distance)
+    self.__hitbox.coords = self.__coords
+  
+  def moveDown(self, distance: int = 0):
+    if (distance == 0):
+      distance = self.__speed
+    self.__coords = (self.__coords[0], self.__coords[1] + distance)
+    self.__hitbox.coords = self.__coords
+
+  def shoot(self, color: pygame.Color,  speed: int = 10, radius: float = 10):
+    self.__shots.append(Shot(color, self.__coords, radius, speed))
+  
+  def findShot(self, shot: Shot):
+    try:
+      return self.__shots.index(shot)
+    except:
+      return -1
+  
+  def die(self):
+    self.__alive = False
+    self.__size = 0
+    self.__hitbox = None

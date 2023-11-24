@@ -1,4 +1,5 @@
 import pygame
+from pygame.locals import *
 from core.resolver import ResolverConfig, ResolverFile, ResolverPath
 import importlib.util
 

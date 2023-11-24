@@ -1,11 +1,12 @@
 import pygame
-
+from entities.hitbox import Hitbox
 class Shot():
     def __init__(self, color: pygame.color, initialCoords = (0, 0), radius: float = 10, speed: int = 10):
         self.__color = color
         self.__coords = initialCoords
         self.__radius = radius
         self.__speed = speed
+        self.__hitbox = Hitbox(self.__coords, self.__radius)
 
     @property
     def coords(self):
@@ -38,7 +39,10 @@ class Shot():
     @speed.setter    
     def speed(self, newSpeed):
         self.__speed = newSpeed
-    
+
+    def hit(self, coords) -> bool:
+        return self.__hitbox.hit(coords)
+
     def moveLeft(self, distance):
         self.__coords = (self.__coords[0] - distance, self.__coords[1])
     
