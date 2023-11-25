@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import NewType, TypedDict
+from typing import NewType, TypedDict, Type
 
 import pygame
 
@@ -16,13 +16,16 @@ class TSettings(TypedDict):
   window: TSettingsWindow
   game: TSettingsGame
 
+class TDataScript(TypedDict):
+  name: str
+  type: Type
+  value: any
+
 TFrame = NewType("TFrame", "pygame.Surface")
-
 TCoord = NewType("TCoord", "tuple[int, int]")
-  
 TSize = NewType("TSize", "tuple[int, int]")
-
 TColor = NewType("TColor", "tuple[int, int, int]")
+
 class TDimension(TypedDict):
   width: int
   height: int

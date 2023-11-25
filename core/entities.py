@@ -1,6 +1,5 @@
 from pygame import Surface
 import pygame
-from core.resolver import ResolverConfig
 from core.sprite import SpriteSlicer
 
 import core.types as types
@@ -24,21 +23,47 @@ class Damage:
   def __str__(self):
     return f"{self.__damage}@{self.__damageType.name}"
 
+
+class Script:
+  def __init__(self):
+    pass
+
+  def setup(self, owner: any, data: types.TDataScript = None):
+    pass
+
+  def loop(self):
+    pass
 class Entity:
-  def __init__(self, name: str, coords: tuple):
+  def __init__(self, name: str, coords: types.TCoord, dataScript: types.TDataScript = None, script: Script = None):
     self._name = name
-    self._coords = coords
+    self._coords: types.TCoord = coords
     self._delta = ResolverConfig.resolve()["game"]["frameRate"]
+    self._script = script
+    if self._script is not None:
+      self._script.setup(self, dataScript)
+
+  def moving(self, coords: types.TCoord):
+    self._coords = (self._coords[0] + coords[0], self._coords[1] + coords[1])
+
+  @property
+  def name(self) -> str:
+    return self._name
+  
+  @property
+  def coords(self) -> types.TCoord:
+    return self._coords
 
   def update(self, screen: Surface):
+    self._script.loop()
     pass
 
   def __str__(self):
     return f"{self.__name}@{self.__coords}"
 
+
 class Text(Entity):
-  def __init__(self, name: str, coords: tuple, text: str, size: int = 20, color: types.TColor = (0, 0, 0), fontFamily: str = "Arial"):
-    super().__init__(name, coords)
+  def __init__(self, name: str, coords: tuple, text: str, size: int = 20, color: types.TColor = (0, 0, 0), fontFamily: str = "Arial", script: Script = None):
+    super().__init__(name, coords, script)
     self.__text = text
     self.__size = size
     self.__color = color
@@ -50,16 +75,16 @@ class Text(Entity):
     screen.blit(text, self._coords)
 
 class Sprite(Entity):
-  def __init__(self, name: str, coords: tuple, sprite: pygame.Surface):
-    super().__init__(name, coords)
+  def __init__(self, name: str, coords: tuple, sprite: types.TFrame, script: Script = None):
+    super().__init__(name, coords, script)
     self.__sprite = sprite
 
   def update(self, screen: Surface):
     screen.blit(self.__sprite, self._coords)
 
 class AnimatedSprite(Entity):
-  def __init__(self, name: str, coords: tuple, sprites: SpriteSlicer, fps: int = 10, loop: bool = True, stopWithSprite: int = None, timeToStop: int = None, rollback: bool = False):
-    super().__init__(name, coords)
+  def __init__(self, name: str, coords: tuple, sprites: SpriteSlicer, fps: int = 10, loop: bool = True, stopWithSprite: int = None, timeToStop: int = None, rollback: bool = False, script: Script = None):
+    super().__init__(name, coords, script)
     self.__sprites = sprites.getAll()
     self.__fps = fps
     self.__currentSprite = 0
