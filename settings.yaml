@@ -12,8 +12,8 @@ paths:
   scenes:  scenes
 # settings of game
 game:
-  frameRate: 24
-  mainScene: test_game
+  frameRate: 60
+  mainScene: lobby
   colors:
     white: !!python/tuple [255, 255, 255]
     black: !!python/tuple [40, 50, 20]
