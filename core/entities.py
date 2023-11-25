@@ -60,6 +60,14 @@ class Text(Entity):
     self.__color = color
     self.__fontFamily = fontFamily
   
+  @property
+  def text(self):
+    return self.__text
+
+  @text.setter
+  def text(self, newText):
+    self.__text = newText
+
   def update(self, screen: Surface):
     font = pygame.font.SysFont(self.__fontFamily, self.__size)
     text = font.render(self.__text, True, self.__color)

@@ -1,10 +1,21 @@
 import pygame
+from pygame import *
+from pygame.locals import *
 from entities.shot import Shot
 from core.hitbox import Hitbox
-from pygame.locals import *
+from entities.gun import Gun
 
 class Player:  
-  def __init__(self, name: str, color: pygame.Color, initialCoords = (0, 0), hp: int = 100, size: int = 40, speed: int = 20):
+  def __init__(
+    self, 
+    name: str, 
+    color: pygame.Color, 
+    initialCoords = (0, 0), 
+    hp: int = 100, 
+    gun: Gun = None,
+    speed: int = 20,
+    size: int = 40
+    ):
     self.__alive = True
     self.__hp = hp
     self.__name = name
@@ -13,7 +24,9 @@ class Player:
     self.__size = size
     self.__speed = speed
     self.__hitbox = Hitbox(self.__coords, self.__size)
-    self.__shots = []
+    self.__gun = gun
+    self.__shots = gun.shots
+    self.__gun.coords = self.__coords
     
   @property
   def alive(self):
@@ -30,7 +43,7 @@ class Player:
   @coords.setter
   def coords(self, newCoords):
     self.__coords = newCoords
-  
+
   @property
   def color(self):
     return self.__color
@@ -71,31 +84,56 @@ class Player:
   def shots(self, newShots):
     self.__shots = newShots
 
+  @property
+  def gun(self):
+    return self.__gun
+  
+  @gun.setter
+  def gun(self, newGun):
+    self.__gun = newGun
+
   def hit(self, coords) -> bool:
     return self.__hitbox.hit(coords)
 
   def moveUp(self, distance: int = 0):
-    if (distance == 0): 
+    if (distance == 0):
       distance = self.__speed
     self.__coords = (self.__coords[0], self.__coords[1] - distance)
-    self.__hitbox.coords = self.__coords
+    self.gun.coords = self.__coords
+    self.__hitbox.coords = self.__coordssd
   
   def moveDown(self, distance: int = 0):
     if (distance == 0):
       distance = self.__speed
     self.__coords = (self.__coords[0], self.__coords[1] + distance)
+    self.gun.coords = self.__coords
     self.__hitbox.coords = self.__coords
 
-  def shoot(self, color: pygame.Color,  speed: int = 10, radius: float = 10):
-    self.__shots.append(Shot(color, self.__coords, radius, speed))
+  def shoot(self):
+    if self.__gun != None:
+      self.__gun.shoot()
+      
+  def removeShot(self, shot: Shot):
+    self.__gun.removeShot(shot)
+
+  def reload(self):
+    if self.__gun != None:
+      self.__gun.reload()
   
-  def findShot(self, shot: Shot):
-    try:
-      return self.__shots.index(shot)
-    except:
-      return -1
-  
+  def isInsideLimits(self, screen: Surface, coords = None):
+    if (coords == None):
+      coords = self.__coords
+    return (coords[0] > 0 and
+            coords[0] < screen.get_width() and
+            coords[1] > 0 and 
+            coords[1] < screen.get_height()
+            )
+
   def die(self):
     self.__alive = False
     self.__size = 0
     self.__hitbox = None
+    self.__alive = True
+    self.__hp = 0
+    self.__speed = 0
+    self.__gun = None
