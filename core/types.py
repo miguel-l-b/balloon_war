@@ -21,6 +21,19 @@ class TDataScript(TypedDict):
   type: Type
   value: any
 
+class Script:
+  def __init__(self):
+    pass
+
+  def setup(self, owner: any, data: TDataScript = None):
+    pass
+
+  def loop(self):
+    pass
+class TScript(TypedDict):
+  data: TDataScript
+  script: Script
+
 TFrame = NewType("TFrame", "pygame.Surface")
 TCoord = NewType("TCoord", "tuple[int, int]")
 TSize = NewType("TSize", "tuple[int, int]")

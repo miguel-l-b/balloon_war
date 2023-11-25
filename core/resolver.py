@@ -2,9 +2,7 @@ import importlib
 import random
 import yaml
 import os
-from core.entities import Script
 import core.types as types
-
 class ResolverConfig:
   __settings: types.TSettings = None
   def __init__(self):
@@ -43,7 +41,7 @@ class ResolverScript:
     return "".join(capitalized_words)
 
   @staticmethod
-  def getScript(path: str) -> Script:
+  def getScript(path: str) -> types.Script:
     name = path.split("/").reverse()[0]
     class_name = ResolverScript.__convert_to_class_name(name)
 
