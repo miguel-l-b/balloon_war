@@ -2,6 +2,22 @@ import pygame
 from core.resolver import ResolverPath
 import core.types as types
 
+class Sprite:
+  def __init__(self, file_name: str, resize: types.TSize = None):
+    self.__file_name = file_name
+    self.__resize = resize
+    self.__load()
+
+  def __load(self):
+    if self.__resize != None:
+      self.__image = pygame.transform.scale(pygame.image.load(ResolverPath.resolve(self.__file_name)), self.__resize)
+    else:
+      self.__image = pygame.image.load(ResolverPath.resolve(self.__file_name))
+
+  @property
+  def image(self) -> types.TFrame:
+    return self.__image
+
 class SpriteSlicer:
     def __init__(self, file_name: str, dimensions: types.TDimension, stopWithSprite: int = None, resize: types.TSize = None):
       self.__file_name = file_name
@@ -10,7 +26,7 @@ class SpriteSlicer:
         self.__amount = self.__dimensions["rows"] * self.__dimensions["columns"]
       else:
         self.__amount = stopWithSprite
-      self.__frames: list[pygame.Surface] = []
+      self.__frames: list[types.TFrame] = []
       self.__resize = resize
       self.__load()
 

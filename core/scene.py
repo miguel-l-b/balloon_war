@@ -7,6 +7,7 @@ from core.resolver import ResolverConfig
 class Scene:
   def __init__(self, screen: Surface) -> None:
     self._screen = screen
+    self._objects: list[Entity] = []
     self._limitFPS = ResolverConfig.resolve()["game"]["frameRate"]
 
   def draw(self):

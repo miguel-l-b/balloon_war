@@ -13,6 +13,21 @@ class ResolverConfig:
       ResolverConfig.__settings = ResolverFile.readYaml(f"{ResolverPath.getLocalPath()}/settings.yaml")
     
     return ResolverConfig.__settings
+  
+  @staticmethod
+  def get(key: str) -> types.TSettings:
+    return ResolverConfig.resolve()[key]
+  
+  @staticmethod
+  def set(key: str, value):
+    keys = key.split("/")
+    settings = ResolverConfig.resolve()
+    for i in range(len(keys)):
+      if i == len(keys) - 1:
+        settings[keys[i]] = value
+      else:
+        settings = settings[keys[i]]
+    ResolverFile.writeYaml(f"{ResolverPath.getLocalPath()}/settings.yaml", ResolverConfig.resolve())
 
 
 class ResolverCoords:
