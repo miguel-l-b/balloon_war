@@ -21,10 +21,10 @@ class CloudMove(types.Script):
     distanceY =  self.speed * delta_time
     r = random.randint(0, 200)
     if 99 > r and r < 110:
-      distanceY *= -0.2
+      distanceY *= -0.002
   
     if 110 > r and r < 120:
-      distanceY *= 0.2
+      distanceY *= 0.002
 
     if r <= 99 or r >= 120:
       distanceY *= 0

@@ -12,6 +12,12 @@ class Scene:
     self._clock = pygame.time.Clock()
     self._limitFPS = ResolverConfig.resolve()["game"]["frameRate"]
 
+  def get(self, name: str) -> Entity:
+    for obj in self.__objects:
+      if obj.name == name:
+        return obj
+    raise Exception(f"Object with name {name} not found")
+
   def spawn(self, obj: any):
     for o in self.__objects:
       if o.name == obj.name:
