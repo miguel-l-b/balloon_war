@@ -1,6 +1,8 @@
 from enum import Enum
 from typing import NewType, TypedDict
 
+import pygame
+
 class TSettingsGame(TypedDict):
   frameRate: int
   mainScene: str
@@ -13,6 +15,8 @@ class TSettings(TypedDict):
   paths: "dict[str, str]"
   window: TSettingsWindow
   game: TSettingsGame
+
+TFrame = NewType("TFrame", "pygame.Surface")
 
 TCoord = NewType("TCoord", "tuple[int, int]")
   
