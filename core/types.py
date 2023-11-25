@@ -16,20 +16,15 @@ class TSettings(TypedDict):
   window: TSettingsWindow
   game: TSettingsGame
 
-TDataScript = NewType("TDataScript", "dict[str, any]")
-
 class Script:
   def __init__(self):
     pass
 
-  def setup(self, owner: any, data: TDataScript = None):
+  def setup(self, owner: any):
     pass
 
   def loop(self, screen: pygame.Surface):
     pass
-class TScript(TypedDict):
-  data: TDataScript
-  script: Script
 
 TFrame = NewType("TFrame", "pygame.Surface")
 TCoord = NewType("TCoord", "tuple[int, int]")
@@ -49,3 +44,36 @@ class EDamageType(Enum):
   WATER = 3
   EARTH = 4
   ELECTRIC = 5
+
+class zGroup:
+  def __init__(self, z: int, name: str):
+    self.__z = z
+    self.__name = name
+
+  @property
+  def z(self):
+    return self.__z
+  
+  @property
+  def name(self):
+    return self.__name
+
+  def __lt__(self, other):
+    return self.__z < other.__z
+  
+  def __gt__(self, other):
+    return self.__z > other.__z
+  
+  def __le__(self, other):
+    return self.__z <= other.__z
+  
+  def __ge__(self, other):
+    return self.__z >= other.__z
+
+  def __eq__(self, other: "zGroup"):
+    if isinstance(other, zGroup):
+      return self.__name == other.__name
+    return False
+
+  def __str__(self):
+    return f"{self.__z}@{self.__name}"

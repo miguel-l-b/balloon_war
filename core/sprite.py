@@ -91,7 +91,7 @@ class SpriteSlicer:
     def getAll(self) -> "list[pygame.Surface]":
       return self.__frames
     
-    def get(self, index: int) -> pygame.Surface:
+    def get(self, index: int) -> types.TFrame:
       if(index < 0 or index > len(self.__frames)-1):
         raise Exception("SpriteSlicer: The index is greater than the amount of sprites.")
       return self.__frames[index]
