@@ -1,7 +1,7 @@
 import pygame
 from pygame import *
 from pygame.locals import *
-from core.entities import AnimatedSprite, Entity
+from core.entities import *
 from core.resolver import ResolverConfig, ResolverCoords, ResolverPath
 from core.scene import Scene
 from core.sprite import SpriteSlicer
@@ -9,21 +9,36 @@ from core.sprite import SpriteSlicer
 class LobbyScene(Scene):
   def __init__(self, screen: Surface) -> None:
     super().__init__(screen)
+    self.__sprites: list[Sprite] = [
+      SpriteSlicer(
+        ResolverPath.resolve("@sprites/title_game.png"),
+        {"width": 157, "height": 40, "rows": 5, "columns": 4},
+        18,
+        (157 * 2, 40 * 2)
+      ),
+      SpriteSlicer(
+        ResolverPath.resolve("@sprites/cloud.png"),
+        {"width": 60, "height": 24, "rows": 3, "columns": 2},
+        5,
+        (60 * 2, 24 * 2)
+      )
+    ]
     self._objects: list[Entity] = [
       AnimatedSprite(
         "title",
         ResolverCoords.getCoordsWithCenterX(ResolverConfig.resolve()["window"]["dimension"], (157*2, 40*2)),
-        SpriteSlicer(
-          ResolverPath.resolve("@sprites/title_game.png"),
-          {"width": 157, "height": 40, "rows": 5, "columns": 4},
-          18,
-          (157 * 2, 40 * 2)
-        ),
+        self.__sprites[0],
         25,
         rollback=True,
         stopWithSprite=18,
         timeToStop=1
-      )
+      ),
+      Sprite(
+        "cloud",
+        ResolverCoords.getCoordsWithCenterX(ResolverConfig.resolve()["window"]["dimension"], (128*2, 128*2)),
+        self.__sprites[1].get(0),
+        
+      ),
     ]
 
 def start(screen: Surface):
