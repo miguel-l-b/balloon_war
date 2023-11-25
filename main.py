@@ -16,14 +16,20 @@ main = ResolverConfig.resolve()["game"]["mainScene"]
 for scene in ResolverFile.getAllFilesWithExtension("@scenes", ".py"):
   name_scene = scene.replace(".py", "")
   if name_scene == main:
-    spec = importlib.util.spec_from_file_location(
-      name_scene,
-      ResolverPath.resolve(f"@scenes/{scene}")
-    )
-    modulo = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(modulo)
-    
-    modulo.start(screen)
+    path = ResolverPath.resolve(f"@scenes/{scene}")
+    try:
+      spec = importlib.util.spec_from_file_location(
+        name_scene,
+        path
+      )
+      modulo = importlib.util.module_from_spec(spec)
+      spec.loader.exec_module(modulo)
+      
+      getattr(modulo, "start")(screen)
+    except ImportError:
+      raise ImportError(f"Não foi possível importar o módulo {name_scene} de {path}.")
+    except AttributeError:
+      raise AttributeError(f"A função start não foi encontrada no módulo {path}.")
     break
 
 pygame.quit()
