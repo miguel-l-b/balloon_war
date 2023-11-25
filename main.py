@@ -5,6 +5,7 @@ import importlib.util
 
 pygame.init()
 pygame.mixer.init()
+pygame.display.set_icon(pygame.image.load(ResolverPath.resolve("@assets/icon.png")))
 pygame.display.set_caption(ResolverConfig.resolve()["window"]["title"])
 screen = pygame.display.set_mode(
   ResolverConfig.resolve()["window"]["dimension"],
