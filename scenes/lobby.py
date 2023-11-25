@@ -9,44 +9,55 @@ from core.sprite import SpriteSlicer
 class LobbyScene(Scene):
   def __init__(self, screen: Surface) -> None:
     super().__init__(screen)
-    self.__sprites: list = [
+    sprites: list = [
       SpriteSlicer(
         ResolverPath.resolve("@sprites/title_game.png"),
         {"width": 157, "height": 40, "rows": 5, "columns": 4},
         18,
         (157 * 2, 40 * 2)
-      ),
-      SpriteSlicer(
-        ResolverPath.resolve("@sprites/cloud.png"),
-        {"width": 60, "height": 24, "rows": 3, "columns": 2},
-        5,
-        (60 * 2, 24 * 2)
       )
     ]
-    self._objects: list[Entity] = [
+    
+    zTop = types.zGroup(1, "top")
+    zBottom = types.zGroup(-1, "bottom")
+    zMedium = types.zGroup(0, "medium")
+
+    self.spawn(
       AnimatedSprite(
         "title",
-        ResolverCoords.getCoordsWithCenterX(ResolverConfig.resolve()["window"]["dimension"], self.__sprites[0].size),
-        self.__sprites[0],
-        25,
+        ResolverCoords.getCoordsWithCenterX(ResolverConfig.resolve()["window"]["dimension"], sprites[0].size),
+        zMedium,
+        sprites[0],
+        10,
         rollback=True,
         stopWithSprite=18,
         timeToStop=1
-      ),
-      Sprite(
-        "cloud",
-        ResolverCoords.getCoordsWithCenterX(ResolverConfig.resolve()["window"]["dimension"], self.__sprites[1].size),
-        self.__sprites[1].get(0),
+      )
+    )
+    self.spawn(
+      Entity(
+        "cloud_generator",
+        (0, 0),
+        zBottom,
         [
-          {
-            "script": ResolverScript.getScript("cloud_move"),
-            "data": {
-              "speed": 2
-            }
-          }
+          ResolverScript.getScript("cloud_generator", self, [zBottom, zMedium], 5)
         ]
-      ),
-    ]
+      )
+    )
+
+    self.spawn(
+      Text(
+        "show_fps",
+        (10, 10),
+        zTop,
+        "FPS: 0",
+        10,
+        (250, 20, 35),
+        script=[
+          ResolverScript.getScript("fps", self._clock)
+        ]
+      )
+    )
 
 def start(screen: Surface):
   pygame.mixer.music.load(ResolverPath.resolve("@audio/music/retro_music_in_game.wav"))
