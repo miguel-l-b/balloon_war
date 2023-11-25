@@ -16,10 +16,7 @@ class TSettings(TypedDict):
   window: TSettingsWindow
   game: TSettingsGame
 
-class TDataScript(TypedDict):
-  name: str
-  type: Type
-  value: any
+TDataScript = NewType("TDataScript", "dict[str, any]")
 
 class Script:
   def __init__(self):
@@ -28,7 +25,7 @@ class Script:
   def setup(self, owner: any, data: TDataScript = None):
     pass
 
-  def loop(self):
+  def loop(self, screen: pygame.Surface):
     pass
 class TScript(TypedDict):
   data: TDataScript

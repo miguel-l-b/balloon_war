@@ -2,14 +2,14 @@ import pygame
 from pygame import *
 from pygame.locals import *
 from core.entities import *
-from core.resolver import ResolverConfig, ResolverCoords, ResolverPath
+from core.resolver import ResolverConfig, ResolverCoords, ResolverPath, ResolverScript
 from core.scene import Scene
 from core.sprite import SpriteSlicer
 
 class LobbyScene(Scene):
   def __init__(self, screen: Surface) -> None:
     super().__init__(screen)
-    self.__sprites: list[Sprite] = [
+    self.__sprites: list = [
       SpriteSlicer(
         ResolverPath.resolve("@sprites/title_game.png"),
         {"width": 157, "height": 40, "rows": 5, "columns": 4},
@@ -26,7 +26,7 @@ class LobbyScene(Scene):
     self._objects: list[Entity] = [
       AnimatedSprite(
         "title",
-        ResolverCoords.getCoordsWithCenterX(ResolverConfig.resolve()["window"]["dimension"], (157*2, 40*2)),
+        ResolverCoords.getCoordsWithCenterX(ResolverConfig.resolve()["window"]["dimension"], self.__sprites[0].size),
         self.__sprites[0],
         25,
         rollback=True,
@@ -35,8 +35,16 @@ class LobbyScene(Scene):
       ),
       Sprite(
         "cloud",
-        ResolverCoords.getCoordsWithCenterX(ResolverConfig.resolve()["window"]["dimension"], (128*2, 128*2)),
-        self.__sprites[1].get(0)
+        ResolverCoords.getCoordsWithCenterX(ResolverConfig.resolve()["window"]["dimension"], self.__sprites[1].size),
+        self.__sprites[1].get(0),
+        [
+          {
+            "script": ResolverScript.getScript("cloud_move"),
+            "data": {
+              "speed": 2
+            }
+          }
+        ]
       ),
     ]
 
