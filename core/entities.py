@@ -25,13 +25,14 @@ class Damage:
     return f"{self.__damage}@{self.__damageType.name}"
 
 class Entity:
-  def __init__(self, name: str, coords: types.TCoord, script: types.TScript = None):
+  def __init__(self, name: str, coords: types.TCoord, script: "list[types.TScript]" = None):
     self._name = name
     self._coords: types.TCoord = coords
-    self._delta = ResolverConfig.resolve()["game"]["frameRate"]
+    self._delta = 1/ResolverConfig.resolve()["game"]["frameRate"]
     self._script = script
     if self._script is not None:
-      self._script["script"].setup(self, self._script["data"])
+      for script in self._script:
+        script["script"].setup(self, script["data"])
 
   def moving(self, coords: types.TCoord):
     self._coords = (self._coords[0] + coords[0], self._coords[1] + coords[1])
@@ -45,7 +46,9 @@ class Entity:
     return self._coords
 
   def update(self, screen: Surface):
-    self._script.loop()
+    if self._script is not None:
+      for script in self._script:
+        script["script"].loop(screen, self._delta)
     pass
 
   def __str__(self):
@@ -74,11 +77,12 @@ class Text(Entity):
     screen.blit(text, self._coords)
 
 class Sprite(Entity):
-  def __init__(self, name: str, coords: tuple, sprite, script: types.TScript = None):
+  def __init__(self, name: str, coords: tuple, sprite, script: "list[types.TScript]" = None):
     super().__init__(name, coords, script)
     self.__sprite = sprite
 
   def update(self, screen: Surface):
+    super().update(screen)
     screen.blit(self.__sprite, self._coords)
 
 class AnimatedSprite(Entity):
@@ -94,6 +98,7 @@ class AnimatedSprite(Entity):
     self.__rollback = rollback
 
   def update(self, screen: Surface):
+      super().update(screen)
       self.__timer += self._delta  # Usando o delta de frame para controlar o tempo
 
       # Calcula a quantidade de tempo por frame em milissegundos

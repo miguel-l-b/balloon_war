@@ -1,14 +1,16 @@
+import pygame
 from pygame import Vector2
-from core.entities import Entity, Script
+from core.entities import Entity
+import core.types as types
 
-class CloudMove(Script):
+class CloudMove(types.Script):
   def __init__(self):
     super().__init__()
 
-  def setup(self, owner: Entity):
+  def setup(self, owner: Entity, data: types.TDataScript = None):
     self.owner = owner
+    self.data = data
 
-  def loop(self, delta_time):
-    self.owner.position += Vector2(0.5, 0) * delta_time
-    if self.owner.position.x > 800:
-        self.owner.position = Vector2(-200, 0)
+  def loop(self, screen: pygame.Surface, delta_time: float):
+    move = Vector2(50, 10) * delta_time
+    self.owner.moving((move.x, move.y))
