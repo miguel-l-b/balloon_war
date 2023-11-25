@@ -1,5 +1,8 @@
+import importlib
+import random
 import yaml
 import os
+from core.entities import Script
 import core.types as types
 
 class ResolverConfig:
@@ -29,10 +32,71 @@ class ResolverConfig:
         settings = settings[keys[i]]
     ResolverFile.writeYaml(f"{ResolverPath.getLocalPath()}/settings.yaml", ResolverConfig.resolve())
 
-
-class ResolverCoords:
+class ResolverScript:
   def __init__(self):
     pass
+
+  @staticmethod
+  def __convert_to_class_name(file_name):
+    words = file_name.split("_")
+    capitalized_words = [word.capitalize() for word in words]
+    return "".join(capitalized_words)
+
+  @staticmethod
+  def getScript(path: str) -> Script:
+    name = path.split("/").reverse()[0]
+    class_name = ResolverScript.__convert_to_class_name(name)
+
+    try:
+        module = importlib.import_module(ResolverPath.resolve(f"{name}"))
+    except ImportError:
+        raise ImportError(f"O módulo {name} não pôde ser importado.")
+
+    try:
+        script_class = getattr(module, class_name)
+    except AttributeError:
+        raise AttributeError(f"A classe {class_name} não foi encontrada no módulo {name}.")
+
+    return script_class()
+
+class ResolverCoords:
+  def __init__(self, min: types.TCoord, max: types.TCoord):
+    self.__min = min
+    self.__max = max
+
+  @property
+  def min(self) -> types.TCoord:
+    return self.__min
+  
+  @property
+  def max(self) -> types.TCoord:
+    return self.__max
+  
+  @property
+  def size(self) -> types.TSize:
+    return (self.__max[0] - self.__min[0], self.__max[1] - self.__min[1])
+  
+  @property
+  def center(self) -> types.TCoord:
+    return (self.__min[0] + self.size[0]/2, self.__min[1] + self.size[1]/2)
+  
+  @property
+  def center_x(self) -> int:
+    return self.__min[0] + self.size[0]/2
+  
+  @property
+  def center_y(self) -> int:
+    return self.__min[1] + self.size[1]/2
+  
+  def getRandomCoord(self) -> types.TCoord:
+    return (random.randint(self.__min[0], self.__max[0]), random.randint(self.__min[1], self.__max[1]))
+  
+  def getRandomCoordX(self) -> int:
+    return random.randint(self.__min[0], self.__max[0])
+  
+  def getRandomCoordY(self) -> int:
+    return random.randint(self.__min[1], self.__max[1])
+  
 
   @staticmethod
   def getCoordsWithCenter(screenSize: types.TCoord, size: types.TSize) -> types.TCoord:
