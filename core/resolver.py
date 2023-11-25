@@ -41,7 +41,7 @@ class ResolverScript:
     return "".join(capitalized_words)
 
   @staticmethod
-  def getScript(file_name: str) -> types.Script:
+  def getScript(file_name: str, *args) -> types.Script:
     path = ResolverPath.resolve(f"@scripts/{file_name}.py")
     class_name = ResolverScript.__convert_to_class_name(file_name)
 
@@ -54,7 +54,7 @@ class ResolverScript:
         raise ImportError(f"Não foi possível importar o módulo {class_name} de {path}.")
     except AttributeError:
         raise AttributeError(f"A classe {class_name} não foi encontrada no módulo {path}.")
-    return script_class()
+    return script_class(*args)
 
 class ResolverCoords:
   def __init__(self, min: types.TCoord, max: types.TCoord):
