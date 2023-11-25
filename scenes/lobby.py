@@ -36,8 +36,7 @@ class LobbyScene(Scene):
       Sprite(
         "cloud",
         ResolverCoords.getCoordsWithCenterX(ResolverConfig.resolve()["window"]["dimension"], (128*2, 128*2)),
-        self.__sprites[1].get(0),
-        
+        self.__sprites[1].get(0)
       ),
     ]
 
