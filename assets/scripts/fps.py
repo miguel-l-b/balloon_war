@@ -13,4 +13,4 @@ class Fps(types.Script):
     self.owner = owner
     
   def loop(self, _screen: pygame.Surface, delta_time: float):
-    self.owner.setText = f"FPS: {self.clock.get_fps():.0f}"
+    self.owner.text = f"FPS: {self.clock.get_fps():.0f}"
