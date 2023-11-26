@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from pygame import Surface
 import pygame
 from core.resolver import ResolverConfig
@@ -6,31 +5,13 @@ from core.sprite import SpriteSlicer
 
 import core.types as types
 
-class Damage:
-  def __init__(self, damage: int, damageType: types.EDamageType):
-    self.__damage = damage
-    self.__damageType = damageType
-
-  @property
-  def damage(self):
-    return self.__damage
-  
-  @property
-  def damageType(self):
-    return self.__damageType
-  
-  def __eq__(self, other):
-    return self.__damageType == other.__damageType
-  
-  def __str__(self):
-    return f"{self.__damage}@{self.__damageType.name}"
-
 class Entity:
   def __init__(self, name: str, coords: types.TCoord, zGroup: types.zGroup, script: "list[types.Script]" = None):
     self._name = name
     self._coords: types.TCoord = coords
     self._z = zGroup
     self._delta = 1/ResolverConfig.resolve()["game"]["frameRate"]
+    self._rect: types.TRect = None
     self._script = script
     if self._script is not None:
       for s in self._script:
@@ -38,6 +19,13 @@ class Entity:
 
   def moving(self, coords: types.TCoord):
     self._coords = (self._coords[0] + coords[0], self._coords[1] + coords[1])
+    if self._rect is not None:
+      self._rect.x = self._coords[0]
+      self._rect.y = self._coords[1]
+
+  @property
+  def rect(self) -> types.TRect:
+    return self._rect
 
   @property
   def z(self) -> types.zGroup:
@@ -58,11 +46,11 @@ class Entity:
     pass
 
   def __str__(self):
-    return f"{self._name}@{self._coords}[{self._z}]"
+    return f"{self.__name__}#{self._name}@{self._coords}[{self._z}]"
 
 
 class Text(Entity):
-  def __init__(self, name: str, coords: tuple, zGroup: types.zGroup, text: str, size: int = 20, color: types.TColor = (0, 0, 0), fontFamily: str = "Arial", script: "list[types.Script]" = None):
+  def __init__(self, name: str, coords: types.TCoord, zGroup: types.zGroup, text: str, size: int = 20, color: types.TColor = (0, 0, 0), fontFamily: str = "Arial", script: "list[types.Script]" = None):
     super().__init__(name, coords, zGroup, script)
     self.__text = text
     self.__size = size
@@ -74,7 +62,7 @@ class Text(Entity):
     return self.__text
 
   @text.setter
-  def setText(self, newText: str):
+  def text(self, newText: str):
     self.__text = newText
 
   def update(self, screen: Surface):
@@ -84,20 +72,30 @@ class Text(Entity):
     screen.blit(text, self._coords)
 
 class Sprite(Entity):
-  def __init__(self, name: str, coords: tuple, ZGroup: types.zGroup, sprite: types.TFrame, script: "list[types.Script]" = None):
+  def __init__(self, name: str, coords: types.TCoord, ZGroup: types.zGroup, sprite: types.TFrame, script: "list[types.Script]" = None):
     super().__init__(name, coords, ZGroup, script)
     self.__sprite = sprite
+    self._rect = sprite.get_rect()
+    self._rect.x = coords[0]
+    self._rect.y = coords[1]
 
   @property
   def sprite(self) -> types.TFrame:
     return self.__sprite
+  
+  @sprite.setter
+  def sprite(self, newSprite: types.TFrame):
+    self.__sprite = newSprite
+    self._rect = newSprite.get_rect()
+    self._rect.x = self._coords[0]
+    self._rect.y = self._coords[1]
 
   def update(self, screen: Surface):
     super().update(screen)
-    screen.blit(self.__sprite, self._coords)
+    screen.blit(self.__sprite, self._rect)
 
 class AnimatedSprite(Entity):
-  def __init__(self, name: str, coords: tuple, zGroup: types.zGroup, sprites: SpriteSlicer, fps: int = 10, loop: bool = True, stopWithSprite: int = None, timeToStop: int = None, rollback: bool = False, script: "list[types.Script]" = None):
+  def __init__(self, name: str, coords: types.TCoord, zGroup: types.zGroup, sprites: SpriteSlicer, fps: int = 10, loop: bool = True, stopWithSprite: int = None, timeToStop: int = None, rollback: bool = False, script: "list[types.Script]" = None):
     super().__init__(name, coords, zGroup, script)
     self.__sprites = sprites.getAll()
     self.__fps = fps

@@ -30,6 +30,7 @@ TFrame = NewType("TFrame", "pygame.Surface")
 TCoord = NewType("TCoord", "tuple[int, int]")
 TSize = NewType("TSize", "tuple[int, int]")
 TColor = NewType("TColor", "tuple[int, int, int]")
+TRect = pygame.Rect
 
 class TDimension(TypedDict):
   width: int
@@ -77,3 +78,22 @@ class zGroup:
 
   def __str__(self):
     return f"{self.__z}@{self.__name}"
+  
+class Damage:
+  def __init__(self, damage: int, damageType: EDamageType):
+    self.__damage = damage
+    self.__damageType = damageType
+
+  @property
+  def damage(self):
+    return self.__damage
+  
+  @property
+  def damageType(self):
+    return self.__damageType
+  
+  def __eq__(self, other):
+    return self.__damageType == other.__damageType
+  
+  def __str__(self):
+    return f"{self.__damage}@{self.__damageType.name}"
