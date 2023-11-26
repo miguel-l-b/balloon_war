@@ -41,21 +41,20 @@ class ResolverScript:
     return "".join(capitalized_words)
 
   @staticmethod
-  def getScript(path: str) -> types.Script:
-    name = path.split("/").reverse()[0]
-    class_name = ResolverScript.__convert_to_class_name(name)
+  def getScript(file_name: str, *args) -> types.Script:
+    path = ResolverPath.resolve(f"@scripts/{file_name}.py")
+    class_name = ResolverScript.__convert_to_class_name(file_name)
 
     try:
-        module = importlib.import_module(ResolverPath.resolve(f"{name}"))
-    except ImportError:
-        raise ImportError(f"O módulo {name} não pôde ser importado.")
-
-    try:
+        spec = importlib.util.spec_from_file_location(file_name, path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
         script_class = getattr(module, class_name)
+    except ImportError:
+        raise ImportError(f"Não foi possível importar o módulo {class_name} de {path}.")
     except AttributeError:
-        raise AttributeError(f"A classe {class_name} não foi encontrada no módulo {name}.")
-
-    return script_class()
+        raise AttributeError(f"A classe {class_name} não foi encontrada no módulo {path}.")
+    return script_class(*args)
 
 class ResolverCoords:
   def __init__(self, min: types.TCoord, max: types.TCoord):
@@ -97,17 +96,20 @@ class ResolverCoords:
   
 
   @staticmethod
-  def getCoordsWithCenter(screenSize: types.TCoord, size: types.TSize) -> types.TCoord:
+  def getCoordsWithCenter(screenSize: types.TSize, size: types.TSize) -> types.TCoord:
     return (screenSize[0]/2 - size[0]/2, screenSize[1]/2 - size[1]/2)
   
   @staticmethod
-  def getCoordsWithCenterX(screenSize: types.TCoord, size: types.TSize) -> types.TCoord:
+  def getCoordsWithCenterX(screenSize: types.TSize, size: types.TSize) -> types.TCoord:
     return (screenSize[0]/2 - size[0]/2, size[1])
   
   @staticmethod
-  def getCoordsWithCenterY(screenSize: types.TCoord, size: types.TSize) -> types.TCoord:
+  def getCoordsWithCenterY(screenSize: types.TSize, size: types.TSize) -> types.TCoord:
     return (size[0], screenSize[1]/2 - size[1]/2)
 
+  @staticmethod
+  def getSizeScreen() -> types.TSize:
+    return ResolverConfig.resolve()["window"]["dimension"]
 
 class ResolverPath:
   def __init__(self):

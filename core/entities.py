@@ -5,36 +5,31 @@ from core.sprite import SpriteSlicer
 
 import core.types as types
 
-class Damage:
-  def __init__(self, damage: int, damageType: types.EDamageType):
-    self.__damage = damage
-    self.__damageType = damageType
-
-  @property
-  def damage(self):
-    return self.__damage
-  
-  @property
-  def damageType(self):
-    return self.__damageType
-  
-  def __eq__(self, other):
-    return self.__damageType == other.__damageType
-  
-  def __str__(self):
-    return f"{self.__damage}@{self.__damageType.name}"
-
 class Entity:
-  def __init__(self, name: str, coords: types.TCoord, script: types.TScript = None):
+  def __init__(self, name: str, coords: types.TCoord, zGroup: types.zGroup, script: "list[types.Script]" = None):
     self._name = name
     self._coords: types.TCoord = coords
-    self._delta = ResolverConfig.resolve()["game"]["frameRate"]
+    self._z = zGroup
+    self._delta = 1/ResolverConfig.resolve()["game"]["frameRate"]
+    self._rect: types.TRect = None
     self._script = script
     if self._script is not None:
-      self._script["script"].setup(self, self._script["data"])
+      for s in self._script:
+        s.setup(self)
 
   def moving(self, coords: types.TCoord):
     self._coords = (self._coords[0] + coords[0], self._coords[1] + coords[1])
+    if self._rect is not None:
+      self._rect.x = self._coords[0]
+      self._rect.y = self._coords[1]
+
+  @property
+  def rect(self) -> types.TRect:
+    return self._rect
+
+  @property
+  def z(self) -> types.zGroup:
+    return self._z
 
   @property
   def name(self) -> str:
@@ -45,16 +40,18 @@ class Entity:
     return self._coords
 
   def update(self, screen: Surface):
-    self._script.loop()
+    if self._script is not None:
+      for script in self._script:
+        script.loop(screen, self._delta)
     pass
 
   def __str__(self):
-    return f"{self.__name}@{self.__coords}"
+    return f"{self.__name__}#{self._name}@{self._coords}[{self._z}]"
 
 
 class Text(Entity):
-  def __init__(self, name: str, coords: tuple, text: str, size: int = 20, color: types.TColor = (0, 0, 0), fontFamily: str = "Arial", script: types.TScript = None):
-    super().__init__(name, coords, script)
+  def __init__(self, name: str, coords: types.TCoord, zGroup: types.zGroup, text: str, size: int = 20, color: types.TColor = (0, 0, 0), fontFamily: str = "Arial", script: "list[types.Script]" = None):
+    super().__init__(name, coords, zGroup, script)
     self.__text = text
     self.__size = size
     self.__color = color
@@ -65,25 +62,41 @@ class Text(Entity):
     return self.__text
 
   @text.setter
-  def text(self, newText):
+  def text(self, newText: str):
     self.__text = newText
 
   def update(self, screen: Surface):
+    super().update(screen)
     font = pygame.font.SysFont(self.__fontFamily, self.__size)
     text = font.render(self.__text, True, self.__color)
     screen.blit(text, self._coords)
 
 class Sprite(Entity):
-  def __init__(self, name: str, coords: tuple, sprite, script: types.TScript = None):
-    super().__init__(name, coords, script)
+  def __init__(self, name: str, coords: types.TCoord, ZGroup: types.zGroup, sprite: types.TFrame, script: "list[types.Script]" = None):
+    super().__init__(name, coords, ZGroup, script)
     self.__sprite = sprite
+    self._rect = sprite.get_rect()
+    self._rect.x = coords[0]
+    self._rect.y = coords[1]
+
+  @property
+  def sprite(self) -> types.TFrame:
+    return self.__sprite
+  
+  @sprite.setter
+  def sprite(self, newSprite: types.TFrame):
+    self.__sprite = newSprite
+    self._rect = newSprite.get_rect()
+    self._rect.x = self._coords[0]
+    self._rect.y = self._coords[1]
 
   def update(self, screen: Surface):
-    screen.blit(self.__sprite, self._coords)
+    super().update(screen)
+    screen.blit(self.__sprite, self._rect)
 
 class AnimatedSprite(Entity):
-  def __init__(self, name: str, coords: tuple, sprites: SpriteSlicer, fps: int = 10, loop: bool = True, stopWithSprite: int = None, timeToStop: int = None, rollback: bool = False, script: types.TScript = None):
-    super().__init__(name, coords, script)
+  def __init__(self, name: str, coords: types.TCoord, zGroup: types.zGroup, sprites: SpriteSlicer, fps: int = 10, loop: bool = True, stopWithSprite: int = None, timeToStop: int = None, rollback: bool = False, script: "list[types.Script]" = None):
+    super().__init__(name, coords, zGroup, script)
     self.__sprites = sprites.getAll()
     self.__fps = fps
     self.__currentSprite = 0
@@ -94,31 +107,34 @@ class AnimatedSprite(Entity):
     self.__rollback = rollback
 
   def update(self, screen: Surface):
-      self.__timer += self._delta  # Usando o delta de frame para controlar o tempo
+    super().update(screen)
+    # Atualiza o timer com base no delta
+    self.__timer += self._delta * 1000  # Multiplica por 1000 para converter para milissegundos
 
-      # Calcula a quantidade de tempo por frame em milissegundos
-      time_per_frame = 1000 / self.__fps
+    # Calcula o tempo por sprite em milissegundos
+    time_per_sprite = 1000 / self.__fps
 
-      # Verifica se é hora de avançar para o próximo sprite
-      if self.__timer >= time_per_frame:
-          self.__timer = 0
-          self.__currentSprite += 1
+    # Verifica se é hora de avançar para o próximo sprite
+    if self.__timer >= time_per_sprite:
+        self.__timer = 0
+        self.__currentSprite += 1
 
-          # Verifica se atingiu o último sprite e se deve reiniciar
-          if self.__currentSprite >= len(self.__sprites):
-              if self.__loop:
-                  self.__currentSprite = 0
-              elif self.__rollback:
-                  self.__currentSprite = len(self.__sprites) - 2
+        # Verifica se atingiu o último sprite e se deve reiniciar
+        if self.__currentSprite >= len(self.__sprites):
+            if self.__loop:
+                self.__currentSprite = 0
+            elif self.__rollback:
+                self.__currentSprite = len(self.__sprites) - 2
 
-          # Verifica se deve parar a animação com um sprite específico
-          if self.__stopWithSprite is not None and self.__currentSprite == self.__stopWithSprite:
-              self.__loop = False
+        # Verifica se deve parar a animação com um sprite específico
+        if self.__stopWithSprite is not None and self.__currentSprite == self.__stopWithSprite:
+            self.__loop = False
 
-          # Verifica se deve parar a animação após um determinado tempo
-          if self.__timeToStop is not None and self.__timer >= self.__timeToStop:
-              self.__loop = False
+        # Verifica se deve parar a animação após um determinado tempo
+        if self.__timeToStop is not None and self.__timer >= self.__timeToStop:
+            self.__loop = False
 
-      # Desenha o sprite atual na tela
-      current_sprite = self.__sprites[self.__currentSprite]
-      screen.blit(current_sprite, self._coords)
+    # Desenha o sprite atual na tela
+    current_sprite = self.__sprites[self.__currentSprite]
+    screen.blit(current_sprite, self.coords)
+    
