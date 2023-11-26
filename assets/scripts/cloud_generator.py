@@ -61,10 +61,9 @@ class CloudGenerator(types.Script):
       self.timer = 0
       self.generate(random.randint(0, 1))
     
-    if self.count >= self.quantity**2:
+    if self.count >= self.quantity**self.quantity:
       try:
         self.scene.get("cloud_0")
       except Exception:
         self.count = 0
-    print(self.count)
       
