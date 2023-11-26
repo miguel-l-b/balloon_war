@@ -107,6 +107,9 @@ class ResolverCoords:
   def getCoordsWithCenterY(screenSize: types.TSize, size: types.TSize) -> types.TCoord:
     return (size[0], screenSize[1]/2 - size[1]/2)
 
+  @staticmethod
+  def getSizeScreen() -> types.TSize:
+    return ResolverConfig.resolve()["window"]["dimension"]
 
 class ResolverPath:
   def __init__(self):
