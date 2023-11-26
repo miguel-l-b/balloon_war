@@ -32,10 +32,10 @@ class HitboxSprite:
 
 
 class Hitbox:
-    def __init__(self, coords, size):
+    def __init__(self, coords, size: tuple[int, int]):
         self.__coords = coords
         self.__size = size
-        self.__hitbox = pygame.Rect(self.__coords[0], self.__coords[1], self.__size, self.__size)
+        self.__hitbox = pygame.Rect(self.__coords[0], self.__coords[1], self.__size[0], self.__size[1])
     
     @property
     def coords(self):
@@ -46,13 +46,13 @@ class Hitbox:
         self.__coords = newCoords
     
     def hit(self, coords) -> bool:
-        return (((coords[0] == self.__coords[0] - self.__size or 
-                  coords[0] == self.__coords[0] + self.__size) and 
-                 (coords[1] >= self.__coords[1] - self.__size and 
-                  coords[1] <= self.__coords[1] + self.__size))
+        return (((coords[0] == self.__coords[0] - self.__size[0] or 
+                  coords[0] == self.__coords[0] + self.__size[0]) and 
+                 (coords[1] >= self.__coords[1] - self.__size[1] and 
+                  coords[1] <= self.__coords[1] + self.__size[1]))
                 or
-                ((coords[1] == self.__coords[1] + self.__size or 
-                  coords[1] == self.__coords[1] - self.__size) and
-                 (coords[0] >= self.__coords[0] - self.__size and
-                  coords[0] <= self.__coords[0] + self.__size)
+                ((coords[1] == self.__coords[1] + self.__size[1] or 
+                  coords[1] == self.__coords[1] - self.__size[1]) and
+                 (coords[0] >= self.__coords[0] - self.__size[0] and
+                  coords[0] <= self.__coords[0] + self.__size[0])
                 ))
