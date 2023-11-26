@@ -8,26 +8,47 @@ from entities.gun import Gun
 class Player:  
   def __init__(
     self, 
-    name: str, 
-    color: pygame.Color, 
+    name: str,
+    image_path: str,
+    color: pygame.Color,
     initialCoords = (0, 0), 
     hp: int = 100, 
     gun: Gun = None,
     speed: int = 20,
-    size: int = 40
+    size:tuple[int, int] = (40, 40)
     ):
     self.__alive = True
     self.__hp = hp
     self.__name = name
+    self.__image_path = image_path
     self.__color = color
     self.__coords = initialCoords
     self.__size = size
     self.__speed = speed
-    self.__hitbox = Hitbox(self.__coords, self.__size)
+    self.__current_speed_up = 0
+    self.__current_speed_down = 0
+    self.__hitbox = Hitbox(self.__coords, (self.__size[0], self.__size[1]))
     self.__gun = gun
     self.__shots = gun.shots
     self.__gun.coords = self.__coords
-    
+    self.__is_moving_up = False
+
+  @property
+  def name(self): 
+    return self.__name
+  
+  @name.setter
+  def name(self, newName):
+    self.__name = newName
+  
+  @property
+  def image_path(self):
+    return self.__image_path
+  
+  @image_path.setter
+  def image_path(self, newImagePath):
+    self.__image_path = newImagePath
+  
   @property
   def alive(self):
     return self.__alive
@@ -77,6 +98,22 @@ class Player:
     self.__speed = newSpeed
 
   @property
+  def current_speed_up(self):
+    return self.__current_speed_up
+
+  @speed.setter
+  def current_speed_up(self, newCurrentSpeedUp):
+    self.__current_speed_up = newCurrentSpeedUp
+
+  @property
+  def current_speed_down(self):
+    return self.__current_speed_down
+
+  @speed.setter
+  def current_speed_down(self, newCurrentSpeedDown):
+    self.__current_speed_down = newCurrentSpeedDown
+
+  @property
   def shots(self):
     return self.__shots
   
@@ -92,20 +129,38 @@ class Player:
   def gun(self, newGun):
     self.__gun = newGun
 
+  @property
+  def is_moving_up(self):
+      return self.__is_moving_up
+
+  @is_moving_up.setter
+  def is_moving_up(self, value):
+      self.__is_moving_up = value
+
   def hit(self, coords) -> bool:
     return self.__hitbox.hit(coords)
 
-  def moveUp(self, distance: int = 0):
-    if (distance == 0):
-      distance = self.__speed
-    self.__coords = (self.__coords[0], self.__coords[1] - distance)
+  def moveUp(self, gravity: float = 0):
+    if self.__current_speed_up == 0 and not self.__is_moving_up: # first jump, speed is high and decreasing
+      self.__is_moving_up = True
+      self.__current_speed_up = self.__speed
+      self.__current_speed_down = 0
+    
+    if self.__current_speed_up <= 0 and self.__is_moving_up: # reached top, speed is 0 and no longer moving up
+      self.__is_moving_up = False
+      self.__current_speed_up = 0
+    else:
+      self.__current_speed_up -= gravity # gravity is applied as it goes up
+
+    self.__coords = (self.__coords[0], self.__coords[1] - self.__current_speed_up)
     self.gun.coords = self.__coords
-    self.__hitbox.coords = self.__coordssd
+    self.__hitbox.coords = self.__coords
   
-  def moveDown(self, distance: int = 0):
-    if (distance == 0):
-      distance = self.__speed
-    self.__coords = (self.__coords[0], self.__coords[1] + distance)
+  def moveDown(self, gravity: float = 0):
+    # if self.__current_speed_down < self.__speed: #speed increasing until reaches final speed (self.__speed)
+    self.__current_speed_down += gravity
+
+    self.__coords = (self.__coords[0], self.__coords[1] + self.__current_speed_down)
     self.gun.coords = self.__coords
     self.__hitbox.coords = self.__coords
 
@@ -131,7 +186,7 @@ class Player:
 
   def die(self):
     self.__alive = False
-    self.__size = 0
+    self.__size = (0, 0)
     self.__hitbox = None
     self.__alive = True
     self.__hp = 0
