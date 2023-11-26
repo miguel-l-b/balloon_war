@@ -9,8 +9,9 @@ class Gun():
         damage: int,
         shoot_cooldown_time: int, 
         reload_cooldown_time: int, 
-        bullet_size: int, 
-        bullet_color: pygame.Color, 
+        bullet_size: tuple[int, int], 
+        bullet_image_path: str,
+        bullet_color: pygame.Color,
         bullet_speed: int,
         ):
         self.__name = name
@@ -22,6 +23,7 @@ class Gun():
         self.__meg_capacity = meg_capacity
         self.__bullets = meg_capacity
         self.__bullet_size = bullet_size
+        self.__bullet_image_path = bullet_image_path
         self.__bullet_color = bullet_color
         self.__bullet_speed = bullet_speed
         self.__shots: list[Shot] = []
@@ -76,7 +78,14 @@ class Gun():
 
     def shoot(self):
         if self.__shoot_cooldown == 0 and self.__reload_cooldown == 0 and self.__bullets > 0:
-            self.__shots.append(Shot(self.__bullet_color, self.__coords, self.__bullet_size, self.__bullet_speed))
+            self.__shots.append(
+                Shot(image_path=self.__bullet_image_path, 
+                     color=self.__bullet_color, 
+                     initialCoords=self.__coords, 
+                     size=self.__bullet_size, 
+                     speed=self.__bullet_speed
+                    )
+            )
             self.__shoot_cooldown = self.__shoot_cooldown_time
             self.__bullets -= 1
     

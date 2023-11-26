@@ -1,12 +1,20 @@
 import pygame
 from core.hitbox import Hitbox
 class Shot():
-    def __init__(self, color: pygame.color, initialCoords = (0, 0), radius: float = 10, speed: int = 10):
+    def __init__(
+        self,
+        image_path: str,
+        color: pygame.color,
+        initialCoords = (0, 0), 
+        size: tuple[int, int] = (10, 10), 
+        speed: int = 10
+        ):
+        self.__image_path = image_path
         self.__color = color
         self.__coords = initialCoords
-        self.__radius = radius
+        self.__size = size
         self.__speed = speed
-        self.__hitbox = Hitbox(self.__coords, self.__radius)
+        self.__hitbox = Hitbox(self.__coords, (self.__size[0], self.__size[1]))
 
     @property
     def coords(self):
@@ -17,6 +25,14 @@ class Shot():
         self.__coords = newCoords
 
     @property
+    def image_path(self):
+        return self.__image_path
+
+    @image_path.setter
+    def image_path(self, newImagePath):
+        self.__image_path = newImagePath
+
+    @property
     def color(self):
         return self.__color
     
@@ -25,12 +41,12 @@ class Shot():
         self.__color = newColor
 
     @property
-    def radius(self):
-        return self.__radius
+    def size(self):
+        return self.__size
 
-    @radius.setter    
-    def radius(self, newRadius):
-        self.__radius = newRadius
+    @size.setter    
+    def size(self, newSize):
+        self.__size = newSize
 
     @property
     def speed(self):
