@@ -6,8 +6,8 @@ from core.resolver import ResolverConfig, ResolverCoords, ResolverPath, Resolver
 from core.scene import Scene
 from core.sprite import SpriteSlicer
 
-class LobbyScene(Scene):
-  def __init__(self, screen: Surface) -> None:
+class LobbyScene(Scene):    
+  def __init__(self, screen: Surface):
     super().__init__(screen)
     spriteTitle = SpriteSlicer(
       ResolverPath.resolve("@sprites/title_game.png"),
@@ -71,10 +71,9 @@ class LobbyScene(Scene):
         spriteLongButtons.get(0)
       )
     )
-
-
-def start(screen: Surface):
-  pygame.mixer.music.load(ResolverPath.resolve("@audio/music/retro_music_in_game.wav"))
-  pygame.mixer.music.set_volume(ResolverConfig.resolve()["game"]["volume"])
-  pygame.mixer.music.play(loops=-1)
-  LobbyScene(screen).loop()
+    self._backgroundColor = ResolverConfig.resolve()["game"]["colors"]["cyan"]
+  def start(self):
+    pygame.mixer.music.load(ResolverPath.resolve("@audio/music/retro_music_in_game.wav"))
+    pygame.mixer.music.set_volume(ResolverConfig.resolve()["game"]["volume"])
+    pygame.mixer.music.play(loops=-1)
+    super().start()
