@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from enum import Enum
 from typing import NewType, TypedDict, Type
 
@@ -5,6 +6,7 @@ import pygame
 
 class TSettingsGame(TypedDict):
   frameRate: int
+  loadScene: str
   mainScene: str
   colors: "dict[str, tuple[int, int, int]]"
 class TSettingsWindow(TypedDict):
@@ -45,6 +47,32 @@ class EDamageType(Enum):
   WATER = 3
   EARTH = 4
   ELECTRIC = 5
+
+class Scene:
+  def __init__(self, *args):
+    pass
+
+  def start(self):
+    pass
+
+  def stop(self):
+    pass
+  
+  @property
+  def objects(self):
+    pass
+
+  def addObject(self, obj: any):
+    pass
+
+  def removeObject(self, obj: any):
+    pass
+  
+  def __loop(self, screen: pygame.Surface):
+    pass
+
+  def __str__(self):
+    return f"{self.__name__}#{self.__name}@{self.__objects}"
 
 class zGroup:
   def __init__(self, z: int, name: str):

@@ -13,6 +13,7 @@ paths:
 # settings of game
 game:
   frameRate: 60
+  loadScene: load
   mainScene: lobby
   colors:
     white: !!python/tuple [255, 255, 255]
