@@ -38,7 +38,7 @@ class Scene(types.Scene):
   def kill(self, name: str):
     for obj in self.__objects:
       if obj.name == name:
-        Logger.debug(self.__class__.__name__, f"Spawned {obj.name}")
+        Logger.debug(self.__class__.__name__, f"Killed {obj.name}")
         self.__objects.remove(obj)
         break
 
