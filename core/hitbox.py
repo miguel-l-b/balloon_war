@@ -4,7 +4,7 @@ from core.resolver import ResolverPath
 
 class HitboxSprite:
     def __init__(self, path: str, color: "tuple[int, int, int]" = (255, 0, 0), tolerance: int = 0):
-        self.__path = ResolverPath(path)
+        self.__path = ResolverPath().resolve(path)
         self.__color = color
         self.__tolerance = tolerance
 
@@ -27,6 +27,14 @@ class HitboxSprite:
                     pixels.append((x, y))
         return pixels
     
+    def hit(self, coords: types.TCoord) -> bool:
+        pixels = self.hitbox
+        for i in range (len(pixels)):
+            if (coords[0] == pixels[i][0] and
+                coords[1] == pixels[i][1]
+                ): return True
+        return False
+
     def __str__(self):
         return f"{self.__path}@{self.__color}"
 
