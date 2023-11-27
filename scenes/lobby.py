@@ -68,7 +68,10 @@ class LobbyScene(Scene):
         "btn_play",
         (ResolverCoords.getCoordsWithCenter(ResolverCoords.getSizeScreen(), spriteLongButtons.size)),
         zTop,
-        spriteLongButtons.get(0)
+        spriteLongButtons.get(0),
+        script=[
+          ResolverScript.getScript("btn_start", spriteLongButtons.get(0), spriteLongButtons.get(1))
+        ]
       )
     )
     self._backgroundColor = ResolverConfig.resolve()["game"]["colors"]["cyan"]
