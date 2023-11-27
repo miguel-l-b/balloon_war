@@ -1,3 +1,4 @@
+import datetime
 import importlib.util
 import random
 import threading
@@ -12,7 +13,7 @@ class ResolverConfig:
   @staticmethod
   def resolve() -> types.TSettings:
     if(ResolverConfig.__settings is None):
-      print("Handle Config in settings.yaml")
+      Logger.log("setting", "Loading settings.yaml")
       ResolverConfig.__settings = ResolverFile.readYaml(f"{ResolverPath.getLocalPath()}/settings.yaml")
     
     return ResolverConfig.__settings
@@ -46,7 +47,7 @@ class ResolverScript:
   def getScript(file_name: str, *args) -> types.Script:
     path = ResolverPath.resolve(f"@scripts/{file_name}.py")
     class_name = ResolverScript.__convert_to_class_name(file_name)
-    print(f"Handle Script in {path} - {file_name} [{class_name}]")
+    Logger.log("script", f"Loading {class_name} in {path}")
     try:
         spec = importlib.util.spec_from_file_location(file_name, path)
         module = importlib.util.module_from_spec(spec)
@@ -167,6 +168,16 @@ class ResolverFile:
       return True
     except:
       return False
+    
+  @staticmethod
+  def append(path: str, content: str) -> bool:
+    try:
+      with open(ResolverPath.resolve(path), "a") as file:
+        file.write(content)
+        file.close()
+      return True
+    except:
+      return False
 
   @staticmethod
   def readYaml(path: str) -> dict:
@@ -187,7 +198,23 @@ class ResolverFile:
       return True
     except:
       return False
+    
+  @staticmethod
+  def appendYaml(path: str, content: dict) -> bool:
+    try:
+      with open(ResolverPath.resolve(path), "a") as file:
+        yaml.dump(content, file)
+        file.close()
+      return True
+    except:
+      return False
+    
+class Logger:
+  current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
+  @staticmethod
+  def log(location: str, message: str):
+    ResolverFile.append(f"@logger/{location}-{Logger.current_time}.log", f"[{datetime.datetime.now()}] - {message}\n")
 
 class ResolverScene:
   _instance = None
@@ -225,7 +252,7 @@ class ResolverScene:
   def handleScene(name: str, *args) -> types.Scene:
     class_name = ResolverScene.__convert_to_class_name(name)
     path = ResolverPath.resolve(f"@scenes/{name}.py")
-    print(f"Handle Scene in {path} - {name} [{class_name}]")
+    Logger.log("scene", f"Handle Scene in {path} - {name} [{class_name}]")
     try:
       spec = importlib.util.spec_from_file_location(
         name,

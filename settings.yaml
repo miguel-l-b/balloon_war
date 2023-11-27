@@ -1,7 +1,7 @@
 # setting windows
 window:
-  title: Balloon War
-  dimension: !!python/tuple [500, 800]
+  title:      Balloon War
+  dimension:  !!python/tuple [500, 800]
   fullScreen: false
 # paths of imports assets and scripts
 paths:
@@ -10,20 +10,22 @@ paths:
   scripts: assets/scripts
   audio:   assets/audio
   scenes:  scenes
+  logger:  logs
 # settings of game
 game:
+  debug:     true
   frameRate: 60
   loadScene: load
   mainScene: lobby
   colors:
-    white: !!python/tuple [255, 255, 255]
-    black: !!python/tuple [40, 50, 20]
-    red: !!python/tuple [250, 20, 0]
-    blue: !!python/tuple [20, 0, 250]
-    yellow: !!python/tuple [255, 250, 30]
-    green: !!python/tuple [0, 255, 0]
-    orange: !!python/tuple [255, 165, 0]
-    purple: !!python/tuple [128, 0, 128]
-    pink: !!python/tuple [255, 192, 203]
-    cyan: !!python/tuple [0, 255, 255]
-  volume: 0.05
+    white:   !!python/tuple [255, 255, 255]
+    black:   !!python/tuple [40, 50, 20]
+    red:     !!python/tuple [250, 20, 0]
+    blue:    !!python/tuple [20, 0, 250]
+    yellow:  !!python/tuple [255, 250, 30]
+    green:   !!python/tuple [0, 255, 0]
+    orange:  !!python/tuple [255, 165, 0]
+    purple:  !!python/tuple [128, 0, 128]
+    pink:    !!python/tuple [255, 192, 203]
+    cyan:    !!python/tuple [0, 255, 255]
+  volume:    0.05
