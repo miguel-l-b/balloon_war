@@ -44,6 +44,24 @@ class Hitbox:
     @coords.setter
     def coords(self, newCoords):
         self.__coords = newCoords
+        self.__hitbox = pygame.Rect(self.__coords[0], self.__coords[1], self.__size[0], self.__size[1])
+
+    @property
+    def size(self):
+        return self.__size
+
+    @size.setter
+    def size(self, newSize):
+        self.__size = newSize
+        self.__hitbox = pygame.Rect(self.__coords[0], self.__coords[1], self.__size[0], self.__size[1])
+
+    @property
+    def hitbox(self):
+        return self.__hitbox
+
+    @hitbox.setter
+    def hitbox(self, newHitbox):
+        self.__hitbox = newHitbox
     
     def hit(self, coords) -> bool:
         return (((coords[0] == self.__coords[0] - self.__size[0] or 
