@@ -1,7 +1,7 @@
 # setting windows
 window:
   title: Balloon War
-  dimension: !!python/tuple [500, 800]
+  dimension: !!python/tuple [500, 600]
   fullScreen: false
 # paths of imports assets and scripts
 paths:
