@@ -18,7 +18,7 @@ class BtnStart(types.Script):
     self.__btnHandler.setup(owner)
 
   def click(self, owner: Entity):
-    ManagerScenes(None).goTo("game")
+    ManagerScenes().goTo("game")
   
   def hover(self, owner: Sprite):
     owner.sprite = self.__frameHover
