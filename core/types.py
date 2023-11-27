@@ -49,6 +49,14 @@ class EDamageType(Enum):
   EARTH = 4
   ELECTRIC = 5
 
+class TKeys(TypedDict):
+  up: pygame.KEYDOWN
+  down: pygame.KEYDOWN
+  left: pygame.KEYDOWN
+  right: pygame.KEYDOWN
+  shoot: pygame.KEYDOWN
+  reload: pygame.KEYDOWN
+
 class Scene:
   def __init__(self, *args):
     pass
