@@ -12,6 +12,7 @@ class ResolverConfig:
   @staticmethod
   def resolve() -> types.TSettings:
     if(ResolverConfig.__settings is None):
+      print("Handle Config in settings.yaml")
       ResolverConfig.__settings = ResolverFile.readYaml(f"{ResolverPath.getLocalPath()}/settings.yaml")
     
     return ResolverConfig.__settings
@@ -45,7 +46,7 @@ class ResolverScript:
   def getScript(file_name: str, *args) -> types.Script:
     path = ResolverPath.resolve(f"@scripts/{file_name}.py")
     class_name = ResolverScript.__convert_to_class_name(file_name)
-
+    print(f"Handle Script in {path} - {file_name} [{class_name}]")
     try:
         spec = importlib.util.spec_from_file_location(file_name, path)
         module = importlib.util.module_from_spec(spec)
@@ -196,10 +197,10 @@ class ResolverScene:
     return cls._instance
   
   def __init__(self, *args):
-    if not hasattr(self, '__initialized'):
-      self.__initialized = True
+    if not hasattr(self, '_instanced'):
+      self._instanced = True
       self.__args = args
-      self.__scenes: list[types.Scene] = []
+      self.__scenes: list = []
       self.__load()
   
   def __load(self):
@@ -249,13 +250,13 @@ class ResolverScene:
 class ManagerScenes:
   _instance = None
   def __new__(cls, *args, **kwargs):
-    if cls._instance is None:
-      cls._instance = super(ManagerScenes, cls).__new__(cls)
-    return cls._instance
+    if ManagerScenes._instance is None:
+      ManagerScenes._instance = super(ManagerScenes, cls).__new__(cls)
+    return ManagerScenes._instance
   
   def __init__(self, *args):
-    if not hasattr(self, '__initialized'):
-      self.__initialized = True
+    if not hasattr(self, '_instanced'):
+      self._instanced = True
       self.__scenes_resolver = ResolverScene(*args)
       self.__historic: list[types.Scene] = []
       self.__current_scene = None
@@ -268,10 +269,10 @@ class ManagerScenes:
     if self.__scenes_resolver.isExist(name):
       old = self.__current_scene
       self.__current_scene = self.__scenes_resolver.getByName(name)
-      self.__current_scene.start()
       if old is not None:
         old.stop()
         self.__historic.append(old)
+      self.__current_scene.start()
     else:
       raise Exception(f"Scene {name} not found")
   
