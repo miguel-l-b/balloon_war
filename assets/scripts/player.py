@@ -6,7 +6,7 @@ from core.entities import Entity, Sprite
 
 # remove this player two and make it a way that you can receive the respective necessary keys to make the movement for each player, or something like that
 
-class PlayerMove(type.Script):
+class PlayerMove(types.Script):
     def __init__(self, scene: Scene, speed: int):
         super().__init__()
         self.scene = scene
