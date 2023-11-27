@@ -13,7 +13,6 @@ class ResolverConfig:
   @staticmethod
   def resolve() -> types.TSettings:
     if(ResolverConfig.__settings is None):
-      Logger.log("setting", "Loading settings.yaml")
       ResolverConfig.__settings = ResolverFile.readYaml(f"{ResolverPath.getLocalPath()}/settings.yaml")
     
     return ResolverConfig.__settings
@@ -47,7 +46,7 @@ class ResolverScript:
   def getScript(file_name: str, *args) -> types.Script:
     path = ResolverPath.resolve(f"@scripts/{file_name}.py")
     class_name = ResolverScript.__convert_to_class_name(file_name)
-    Logger.log("script", f"Loading {class_name} in {path}")
+    Logger.debug("script", f"Loading {class_name} in {path}")
     try:
         spec = importlib.util.spec_from_file_location(file_name, path)
         module = importlib.util.module_from_spec(spec)
@@ -213,6 +212,11 @@ class Logger:
   current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
   @staticmethod
+  def debug(location: str, message: str):
+    if ResolverConfig.resolve()["game"]["debug"]:
+      ResolverFile.append(f"@logger/{location}-{Logger.current_time}.log", f"[{datetime.datetime.now()}] - {message}\n")
+
+  @staticmethod
   def log(location: str, message: str):
     ResolverFile.append(f"@logger/{location}-{Logger.current_time}.log", f"[{datetime.datetime.now()}] - {message}\n")
 
@@ -252,7 +256,7 @@ class ResolverScene:
   def handleScene(name: str, *args) -> types.Scene:
     class_name = ResolverScene.__convert_to_class_name(name)
     path = ResolverPath.resolve(f"@scenes/{name}.py")
-    Logger.log("scene", f"Handle Scene in {path} - {name} [{class_name}]")
+    Logger.log("sceneLoader", f"Handle Scene in {path} - {name} [{class_name}]")
     try:
       spec = importlib.util.spec_from_file_location(
         name,
@@ -263,9 +267,9 @@ class ResolverScene:
       
       return getattr(module, class_name)(*args)
     except ImportError:
-      raise ImportError(f"Não foi possível importar o módulo {name} de {path}.")
+      Logger.debug("sceneLoader", (f"Não foi possível importar o módulo {name} de {path}."))
     except AttributeError:
-      raise AttributeError(f"A classe {class_name} não foi encontrada no módulo {path}.")
+      Logger.debug("sceneLoader", (f"A classe {name} não foi encontrada no módulo {path}."))
 
   @staticmethod
   def __convert_to_class_name(file_name):
@@ -300,8 +304,10 @@ class ManagerScenes:
         old.stop()
         self.__historic.append(old)
       self.__current_scene.start()
+      Logger.debug("sceneLoader", f"Scene {name} started")
+      Logger.debug("sceneLoader", f"Scene {old} stopped")
     else:
-      raise Exception(f"Scene {name} not found")
+      Logger.debug("sceneLoader", f"Scene {name} not found")
   
   def goToBack(self):
     self.__historic.pop()

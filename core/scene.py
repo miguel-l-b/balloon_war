@@ -32,13 +32,13 @@ class Scene(types.Scene):
     for o in self.__objects:
       if o.name == obj.name:
         raise Exception(f"Object with name {obj.name} already exists")
-    Logger.log(self.__class__.__name__, f"Spawned {obj.name}")
+    Logger.debug(self.__class__.__name__, f"Spawned {obj.name}")
     self.__objects.append(obj)
   
   def kill(self, name: str):
     for obj in self.__objects:
       if obj.name == name:
-        Logger.log(self.__class__.__name__, f"Spawned {obj.name}")
+        Logger.debug(self.__class__.__name__, f"Spawned {obj.name}")
         self.__objects.remove(obj)
         break
 

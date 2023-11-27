@@ -76,7 +76,7 @@ class LobbyScene(Scene):
     )
     self._backgroundColor = ResolverConfig.resolve()["game"]["colors"]["cyan"]
   def start(self):
-    pygame.mixer.music.load(ResolverPath.resolve("@audio/music/retro_music_in_game.wav"))
+    pygame.mixer.music.load(ResolverPath.resolve("@audio/music/bloodpixelhero_game_music_loop.wav"))
     pygame.mixer.music.set_volume(ResolverConfig.resolve()["game"]["volume"])
     pygame.mixer.music.play(loops=-1)
     super().start()

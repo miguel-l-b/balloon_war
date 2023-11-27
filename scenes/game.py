@@ -2,7 +2,7 @@ import pygame
 from pygame import *
 from pygame.locals import *
 from core.entities import *
-from core.resolver import ResolverConfig, ResolverCoords, ResolverPath, ResolverScript
+from core.resolver import ResolverConfig, ResolverPath, ResolverScript
 from core.scene import Scene
 from core.sprite import SpriteSlicer
 

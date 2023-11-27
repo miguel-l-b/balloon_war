@@ -5,6 +5,7 @@ from typing import NewType, TypedDict, Type
 import pygame
 
 class TSettingsGame(TypedDict):
+  debug: bool
   frameRate: int
   loadScene: str
   mainScene: str
