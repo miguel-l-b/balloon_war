@@ -1,7 +1,8 @@
+import threading
 import pygame
 from pygame.locals import *
-from core.resolver import ResolverConfig, ResolverFile, ResolverPath
-import importlib.util
+from core.resolver import ManagerScenes, ResolverConfig, ResolverPath, ResolverScene
+from core.scene import Scene, SceneLoader
 
 pygame.init()
 pygame.mixer.init()
@@ -11,26 +12,20 @@ screen = pygame.display.set_mode(
   ResolverConfig.resolve()["window"]["dimension"],
   pygame.FULLSCREEN if ResolverConfig.resolve()["window"]["fullScreen"] else 0
 )
+
+load = ResolverConfig.resolve()["game"]["loadScene"]
 main = ResolverConfig.resolve()["game"]["mainScene"]
 
-for scene in ResolverFile.getAllFilesWithExtension("@scenes", ".py"):
-  name_scene = scene.replace(".py", "")
-  if name_scene == main:
-    path = ResolverPath.resolve(f"@scenes/{scene}")
-    try:
-      spec = importlib.util.spec_from_file_location(
-        name_scene,
-        path
-      )
-      modulo = importlib.util.module_from_spec(spec)
-      spec.loader.exec_module(modulo)
-      
-      getattr(modulo, "start")(screen)
-    except ImportError:
-      raise ImportError(f"Não foi possível importar o módulo {name_scene} de {path}.")
-    except AttributeError:
-      raise AttributeError(f"A função start não foi encontrada no módulo {path}.")
-    break
+if load is not None:
+  load_scene: SceneLoader = ResolverScene.handleScene(load, screen)
+  thread_load = threading.Thread(target=load_scene.start)
+  thread_load.start()
+  manager = ManagerScenes(screen)
+  while not load_scene.isFinished:
+    continue
+  manager.goTo(main)
+else:
+  ManagerScenes(screen).goTo(main)
 
 pygame.quit()
 exit()

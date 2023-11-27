@@ -1,5 +1,7 @@
-import importlib
+import datetime
+import importlib.util
 import random
+import threading
 import yaml
 import os
 import core.types as types
@@ -44,7 +46,7 @@ class ResolverScript:
   def getScript(file_name: str, *args) -> types.Script:
     path = ResolverPath.resolve(f"@scripts/{file_name}.py")
     class_name = ResolverScript.__convert_to_class_name(file_name)
-
+    Logger.debug("script", f"Loading {class_name} in {path}")
     try:
         spec = importlib.util.spec_from_file_location(file_name, path)
         module = importlib.util.module_from_spec(spec)
@@ -143,6 +145,7 @@ class ResolverFile:
     for file in ResolverFile.getAllWithDir(path):
       if file.endswith(extension):
         files.append(file)
+    files.sort()
     return files
   
   @staticmethod
@@ -159,6 +162,16 @@ class ResolverFile:
   def write(path: str, content: str) -> bool:
     try:
       with open(ResolverPath.resolve(path), "w") as file:
+        file.write(content)
+        file.close()
+      return True
+    except:
+      return False
+    
+  @staticmethod
+  def append(path: str, content: str) -> bool:
+    try:
+      with open(ResolverPath.resolve(path), "a") as file:
         file.write(content)
         file.close()
       return True
@@ -184,3 +197,122 @@ class ResolverFile:
       return True
     except:
       return False
+    
+  @staticmethod
+  def appendYaml(path: str, content: dict) -> bool:
+    try:
+      with open(ResolverPath.resolve(path), "a") as file:
+        yaml.dump(content, file)
+        file.close()
+      return True
+    except:
+      return False
+    
+class Logger:
+  current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+  @staticmethod
+  def debug(location: str, message: str):
+    if ResolverConfig.resolve()["game"]["debug"]:
+      ResolverFile.append(f"@logger/{location}-{Logger.current_time}.log", f"[{datetime.datetime.now()}] - {message}\n")
+
+  @staticmethod
+  def log(location: str, message: str):
+    ResolverFile.append(f"@logger/{location}-{Logger.current_time}.log", f"[{datetime.datetime.now()}] - {message}\n")
+
+class ResolverScene:
+  _instance = None
+  def __new__(cls, *args, **kwargs):
+    if cls._instance is None:
+      cls._instance = super(ResolverScene, cls).__new__(cls)
+    return cls._instance
+  
+  def __init__(self, *args):
+    if not hasattr(self, '_instanced'):
+      self._instanced = True
+      self.__args = args
+      self.__scenes: list = []
+      self.__load()
+  
+  def __load(self):
+    for scene in ResolverFile.getAllFilesWithExtension("@scenes", ".py"):
+      self.__scenes.append(ResolverScene.handleScene(scene.replace(".py", ""), *self.__args))
+  
+  def isExist(self, name: str) -> bool:
+    class_name = ResolverScene.__convert_to_class_name(name)
+    for scene in self.__scenes:
+      if scene.__class__.__name__ == class_name:
+        return True
+    return False
+
+  def getByName(self, name: str) -> types.Scene:
+    class_name = ResolverScene.__convert_to_class_name(name)
+    for scene in self.__scenes:
+      if scene.__class__.__name__ == class_name:
+        return scene
+    raise Exception(f"Scene {class_name} not found")
+
+  @staticmethod
+  def handleScene(name: str, *args) -> types.Scene:
+    class_name = ResolverScene.__convert_to_class_name(name)
+    path = ResolverPath.resolve(f"@scenes/{name}.py")
+    Logger.log("sceneLoader", f"Handle Scene in {path} - {name} [{class_name}]")
+    try:
+      spec = importlib.util.spec_from_file_location(
+        name,
+        path
+      )
+      module = importlib.util.module_from_spec(spec)
+      spec.loader.exec_module(module)
+      
+      return getattr(module, class_name)(*args)
+    except ImportError:
+      Logger.debug("sceneLoader", (f"Não foi possível importar o módulo {name} de {path}."))
+    except AttributeError:
+      Logger.debug("sceneLoader", (f"A classe {name} não foi encontrada no módulo {path}."))
+
+  @staticmethod
+  def __convert_to_class_name(file_name):
+    file_name += "_scene"
+    words = file_name.split("_")
+    capitalized_words = [word.capitalize() for word in words]
+    return "".join(capitalized_words)
+  
+class ManagerScenes:
+  _instance = None
+  def __new__(cls, *args, **kwargs):
+    if ManagerScenes._instance is None:
+      ManagerScenes._instance = super(ManagerScenes, cls).__new__(cls)
+    return ManagerScenes._instance
+  
+  def __init__(self, *args):
+    if not hasattr(self, '_instanced'):
+      self._instanced = True
+      self.__scenes_resolver = ResolverScene(*args)
+      self.__historic: list[types.Scene] = []
+      self.__current_scene = None
+
+  @property
+  def current_scene(self) -> str:
+    return self.__current_scene
+
+  def goTo(self, name: str):
+    if self.__scenes_resolver.isExist(name):
+      old = self.__current_scene
+      self.__current_scene = self.__scenes_resolver.getByName(name)
+      if old is not None:
+        old.stop()
+        self.__historic.append(old)
+      self.__current_scene.start()
+      Logger.debug("sceneLoader", f"Scene {name} started")
+      Logger.debug("sceneLoader", f"Scene {old} stopped")
+    else:
+      Logger.debug("sceneLoader", f"Scene {name} not found")
+  
+  def goToBack(self):
+    self.__historic.pop()
+    self.goTo(self.__historic.pop())
+  
+  def goToBackAndGoTo(self, name: str):
+    self.__historic.pop()
+    self.goTo(name)

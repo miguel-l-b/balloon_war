@@ -37,7 +37,7 @@ class CloudGenerator(types.Script):
           self.z[direction],
           self.sprite.get(random.randint(0, self.sprite.amount -1)),
           [
-            ResolverScript.getScript("cloud_move", direction, self.scene, random.randint(10, 35))
+            ResolverScript.getScript("cloud_move", direction, self.scene, random.randint(25, 45))
           ]
         )
       )
@@ -49,7 +49,7 @@ class CloudGenerator(types.Script):
           self.z[direction],
           self.sprite.get(random.randint(0, self.sprite.amount -1)),
           [
-            ResolverScript.getScript("cloud_move", direction, self.scene, -random.randint(10, 35))
+            ResolverScript.getScript("cloud_move", direction, self.scene, -random.randint(25, 45))
           ]
         )
       )
@@ -61,7 +61,7 @@ class CloudGenerator(types.Script):
       self.timer = 0
       self.generate(random.randint(0, 1))
     
-    if self.count >= self.quantity**self.quantity:
+    if self.count >= self.quantity*self.limits[0]/25:
       try:
         self.scene.get("cloud_0")
       except Exception:
