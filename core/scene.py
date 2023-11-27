@@ -32,11 +32,13 @@ class Scene(types.Scene):
     for o in self.__objects:
       if o.name == obj.name:
         raise Exception(f"Object with name {obj.name} already exists")
+    print(f"[{self.__class__.__name__}] Spawn {obj.name}")
     self.__objects.append(obj)
   
   def kill(self, name: str):
     for obj in self.__objects:
       if obj.name == name:
+        print(f"[{self.__class__.__name__}] Killed {obj.name}")
         self.__objects.remove(obj)
         break
 
