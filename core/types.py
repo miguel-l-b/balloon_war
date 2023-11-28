@@ -1,8 +1,8 @@
 from abc import abstractmethod
-from enum import Enum
-from typing import NewType, TypedDict, Type
-
 import pygame
+
+from enum import Enum
+from typing import NewType, TypedDict
 
 class TSettingsGame(TypedDict):
   debug: bool
@@ -49,18 +49,10 @@ class EDamageType(Enum):
   EARTH = 4
   ELECTRIC = 5
 
-class TKeys(TypedDict):
-  up: pygame.KEYDOWN
-  down: pygame.KEYDOWN
-  left: pygame.KEYDOWN
-  right: pygame.KEYDOWN
-  shoot: pygame.KEYDOWN
-  reload: pygame.KEYDOWN
-
 class Scene:
   def __init__(self, *args):
     pass
-
+  
   def start(self):
     pass
 

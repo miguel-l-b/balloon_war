@@ -1,7 +1,6 @@
 import datetime
 import importlib.util
 import random
-import threading
 import yaml
 import os
 import core.types as types
@@ -209,16 +208,24 @@ class ResolverFile:
       return False
     
 class Logger:
-  current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-
   @staticmethod
   def debug(location: str, message: str):
     if ResolverConfig.resolve()["game"]["debug"]:
-      ResolverFile.append(f"@logger/{location}-{Logger.current_time}.log", f"[{datetime.datetime.now()}] - {message}\n")
+      ResolverFile.append(f"@logger/{location}.log", f"[{datetime.datetime.now()}] - {message}\n")
 
   @staticmethod
   def log(location: str, message: str):
-    ResolverFile.append(f"@logger/{location}-{Logger.current_time}.log", f"[{datetime.datetime.now()}] - {message}\n")
+    ResolverFile.append(f"@logger/{location}.log", f"[{datetime.datetime.now()}] - {message}\n")
+
+  @staticmethod
+  def error(location: str, message: str):
+    ResolverFile.append(f"@logger/{location}.log", f"[{datetime.datetime.now()}] - {message}\n")
+          
+  @staticmethod
+  def finish():
+    for i in ResolverFile.getAllFilesWithExtension("@logger", ".log"):
+      ResolverFile.append(f"@logger/{i}", f"[{datetime.datetime.now()}] - Game closed, finished logger\n")
+
 
 class ResolverScene:
   _instance = None
@@ -295,6 +302,9 @@ class ManagerScenes:
   @property
   def current_scene(self) -> str:
     return self.__current_scene
+  
+  def setCurrent(self, scene: types.Scene):
+    self.__current_scene = scene
 
   def goTo(self, name: str):
     if self.__scenes_resolver.isExist(name):
