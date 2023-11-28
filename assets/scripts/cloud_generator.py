@@ -57,7 +57,7 @@ class CloudGenerator(types.Script):
 
   def loop(self, _screen: pygame.Surface, delta_time: float):
     self.timer += delta_time
-    if self.timer >= random.randint(5, 10):
+    if self.timer >= random.randint(5, 8):
       self.timer = 0
       self.generate(random.randint(0, 1))
     
