@@ -23,7 +23,7 @@ class CloudGenerator(types.Script):
       ResolverPath.resolve("@sprites/cloud.png"),
       {"width": 60, "height": 24, "rows": 3, "columns": 2},
       5,
-      (60 * 2, 24 * 2)
+      (60 * 2.5, 24 * 2.5)
     )
     for i in range(1, self.quantity+1):
       self.generate(random.randint(0, 1))
@@ -36,7 +36,7 @@ class CloudGenerator(types.Script):
           (-100, random.randint(0, int(self.limits[1]/3)+50)), 
           self.z[direction],
           self.sprite.get(random.randint(0, self.sprite.amount -1)),
-          [
+          script=[
             ResolverScript.getScript("cloud_move", direction, self.scene, random.randint(25, 45))
           ]
         )
@@ -48,7 +48,7 @@ class CloudGenerator(types.Script):
           (self.limits[0]+100, random.randint(0, int(self.limits[1]/3)+550)), 
           self.z[direction],
           self.sprite.get(random.randint(0, self.sprite.amount -1)),
-          [
+          script=[
             ResolverScript.getScript("cloud_move", direction, self.scene, -random.randint(25, 45))
           ]
         )

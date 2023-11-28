@@ -1,3 +1,4 @@
+import pygame
 import core.types as types
 from typing import Callable
 
@@ -14,6 +15,7 @@ class BtnStart(types.Script):
     self.__frameHover = frameHover
 
   def setup(self, owner: Entity):
+    self._owner = owner
     self.__btnHandler = ResolverScript.getScript("button", self.click, self.hover, self.rollback_hover)
     self.__btnHandler.setup(owner)
 
@@ -27,4 +29,7 @@ class BtnStart(types.Script):
     owner.sprite = self.__frameNotHover
 
   def loop(self, screen: Surface, delta_time: float):
-    self.__btnHandler.loop(screen, delta_time)
+    if pygame.key.get_pressed()[pygame.K_SPACE]:
+      self.click(self._owner)
+    else:
+      self.__btnHandler.loop(screen, delta_time)
