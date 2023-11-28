@@ -1,9 +1,11 @@
 from typing import TypedDict
 import pygame
-from core.resolver import ResolverCoords 
+from core.hitbox import Hitbox
+from core.resolver import ResolverCoords, ResolverScript
+from core.sprite import SpriteSlicer 
 import core.types as types
 from core.scene import Scene
-from core.entities import AnimatedSprite
+from core.entities import AnimatedSprite, Sprite
 
 class TKeys(TypedDict):
     up: int
@@ -11,8 +13,9 @@ class TKeys(TypedDict):
     reload: int
 
 class PlayerManager(types.Script):
-    def __init__(self, scene: Scene, speed: int, keys: TKeys, gravity: float):
+    def __init__(self, scene: Scene, num: int, speed: int, keys: TKeys, gravity: float):
         super().__init__()
+        self._num = num
         self._scene = scene
         self._speed = speed
         self._keys = keys
@@ -20,10 +23,25 @@ class PlayerManager(types.Script):
 
     def setup(self, owner: AnimatedSprite):
         self._owner = owner
+        self._ammunitionSprite = SpriteSlicer(
+            "@sprites/darts.png",
+            {
+                "width": 45,
+                "height": 45,
+                "rows": 2,
+                "columns": 1
+            },
+            2,
+            (70, 70)
+        )
         self._limits = ResolverCoords.getSizeScreen()
+        self._ammunition = 10
         self._timer = 0
         self._velocity = 0
         self._jumpIn = 0
+        self._shotIn = 0
+        self._reloadIn = 0
+        self._reloaded = False
 
     def calculateInercie(self, oldVelocity: float, increment: float, delta_time: float):
         return oldVelocity + (increment * delta_time)
@@ -42,5 +60,31 @@ class PlayerManager(types.Script):
         else:
             self._velocity = self.calculateInercie(self._velocity, self._gravity, delta_time)
         self._velocity = self.calculateResistanceAir(self._velocity, delta_time)
+
+        if pygame.key.get_pressed()[self._keys["shoot"]] and self._ammunition > 0 and self._timer - self._shotIn >= 0.5:
+            self._shotIn = self._timer
+            self._scene.spawn(
+                Sprite(
+                    f"dart_{self._ammunition}#{self._num}",
+                    (self._owner.coords[0]+(80 if self._num == 0 else -80), self._owner.coords[1]),
+                    self._owner.z,
+                    self._ammunitionSprite.get(self._num),
+                    hitbox=Hitbox(self._ammunitionSprite.get(0).get_rect()),
+                    script=[
+                        ResolverScript.getScript("dart_move", self._scene, 5, 10, self._num)
+                    ]
+                )
+            )
+            self._ammunition = self._ammunition - 1
+            print(self._ammunition)
+
         
+        elif pygame.key.get_pressed()[self._keys["reload"]] and self._ammunition == 0:
+            self._reloadIn = self._timer
+            self._reloaded = True
+
+        if self._reloaded and self._timer - self._reloadIn >= 0.3:
+            self._reloaded = False
+            self._ammunition = 10
+
         self._owner.moving((0, self._velocity * delta_time))
