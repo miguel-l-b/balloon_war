@@ -22,6 +22,10 @@ class Scene(types.Scene):
   def stop(self):
     self._stop = True
 
+  @property
+  def objects(self) -> "list[Entity]":
+    return self.__objects
+
   def get(self, name: str) -> Entity:
     for obj in self.__objects:
       if obj.name == name:
@@ -29,6 +33,10 @@ class Scene(types.Scene):
     raise Exception(f"Object with name {name} not found")
 
   def spawn(self, obj: any):
+    if obj is None:
+      Logger.log(self.__class__.__name__, "SPAWN - Object is None")
+    if not isinstance(obj, Entity):
+      Logger.log(self.__class__.__name__, "SPAWN - Object is not an Entity")
     for o in self.__objects:
       if o.name == obj.name:
         raise Exception(f"Object with name {obj.name} already exists")
@@ -64,6 +72,7 @@ class Scene(types.Scene):
       pygame.display.update()
       for event in pygame.event.get():
         if event.type == QUIT:
+          Logger.finish()
           pygame.quit()
           exit()
       
@@ -76,11 +85,19 @@ class SceneLoader(types.Scene):
     self.__objects: list[Entity] = []
     self._clock = pygame.time.Clock()
     self._limitFPS = ResolverConfig.resolve()["game"]["frameRate"]
+    self._isFinished = True
     self._stop = False
+
+  @property
+  def objects(self) -> "list[Entity]":
+    return self.__objects
 
   @property
   def isFinished(self):
     return self._isFinished
+  
+  def start(self):
+    return self.__loop()
   
   def stop(self):
     self._stop = True
@@ -118,15 +135,13 @@ class SceneLoader(types.Scene):
         if obj.z == zGroup:
           obj.update(self._screen)
   
-  def start(self):
-    self.__loop()
-  
   def __loop(self):
-    while not self.isFinished:
+    while not self._stop or not self.isFinished:
       self._draw()
       pygame.display.update()
       for event in pygame.event.get():
         if event.type == QUIT:
+          Logger.finish()
           pygame.quit()
           exit()
       
