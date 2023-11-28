@@ -1,18 +1,20 @@
 from pygame import Surface
 import pygame
+from core.hitbox import Hitbox
 from core.resolver import ResolverConfig
 from core.sprite import SpriteSlicer
 
 import core.types as types
 
 class Entity:
-  def __init__(self, name: str, coords: types.TCoord, zGroup: types.zGroup, script: "list[types.Script]" = None):
+  def __init__(self, name: str, coords: types.TCoord, zGroup: types.zGroup, hitbox: types.Hitbox = None, script: "list[types.Script]" = None):
     self._name = name
     self._coords: types.TCoord = coords
     self._z = zGroup
     self._delta = 1/ResolverConfig.resolve()["game"]["frameRate"]
     self._rect: types.TRect = None
     self._script = script
+    self._hitbox = hitbox
     if self._script is not None:
       for s in self._script:
         s.setup(self)
@@ -26,6 +28,10 @@ class Entity:
   @property
   def rect(self) -> types.TRect:
     return self._rect
+  
+  @property
+  def hitbox(self) -> types.Hitbox:
+    return self._hitbox
 
   @property
   def z(self) -> types.zGroup:
@@ -51,7 +57,7 @@ class Entity:
 
 class Text(Entity):
   def __init__(self, name: str, coords: types.TCoord, zGroup: types.zGroup, text: str, size: int = 20, color: types.TColor = (0, 0, 0), fontFamily: str = "Arial", script: "list[types.Script]" = None):
-    super().__init__(name, coords, zGroup, script)
+    super().__init__(name, coords, zGroup, None, script)
     self.__text = text
     self.__size = size
     self.__color = color
@@ -60,20 +66,21 @@ class Text(Entity):
   @property
   def text(self):
     return self.__text
-
+  
+  def __handleText(self):
+    return pygame.font.SysFont(self.__fontFamily, self.__size).render(self.__text, True, self.__color)
   @text.setter
   def text(self, newText: str):
     self.__text = newText
+    self._hitbox = Hitbox(self.__handleText())
 
   def update(self, screen: Surface):
     super().update(screen)
-    font = pygame.font.SysFont(self.__fontFamily, self.__size)
-    text = font.render(self.__text, True, self.__color)
-    screen.blit(text, self._coords)
+    screen.blit(self.__handleText(), self._coords)
 
 class Sprite(Entity):
-  def __init__(self, name: str, coords: types.TCoord, ZGroup: types.zGroup, sprite: types.TFrame, script: "list[types.Script]" = None):
-    super().__init__(name, coords, ZGroup, script)
+  def __init__(self, name: str, coords: types.TCoord, ZGroup: types.zGroup, sprite: types.TFrame, hitbox: types.Hitbox = None, script: "list[types.Script]" = None):
+    super().__init__(name, coords, ZGroup, hitbox, script)
     self.__sprite = sprite
     self._rect = sprite.get_rect()
     self._rect.x = coords[0]
@@ -95,8 +102,8 @@ class Sprite(Entity):
     screen.blit(self.__sprite, self._rect)
 
 class AnimatedSprite(Entity):
-  def __init__(self, name: str, coords: types.TCoord, zGroup: types.zGroup, sprites: SpriteSlicer, fps: int = 10, loop: bool = True, stopWithSprite: int = None, timeToStop: int = None, rollback: bool = False, script: "list[types.Script]" = None):
-    super().__init__(name, coords, zGroup, script)
+  def __init__(self, name: str, coords: types.TCoord, zGroup: types.zGroup, sprites: SpriteSlicer, fps: int = 10, loop: bool = True, stopWithSprite: int = None, timeToStop: int = None, rollback: bool = False, hitbox: types.Hitbox = None, script: "list[types.Script]" = None):
+    super().__init__(name, coords, zGroup, hitbox, script)
     self.__sprites = sprites.getAll()
     self.__fps = fps
     self.__currentSprite = 0

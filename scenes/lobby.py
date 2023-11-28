@@ -43,7 +43,7 @@ class LobbyScene(Scene):
         "cloud_generator",
         (0, 0),
         zBottom,
-        [
+        script=[
           ResolverScript.getScript("cloud_generator", self, [zBottom, zMedium], 5)
         ]
       )
@@ -69,6 +69,7 @@ class LobbyScene(Scene):
         (ResolverCoords.getCoordsWithCenter(ResolverCoords.getSizeScreen(), spriteLongButtons.size)),
         zTop,
         spriteLongButtons.get(0),
+        hitbox=Hitbox(spriteLongButtons.get(0)),
         script=[
           ResolverScript.getScript("btn_start", spriteLongButtons.get(0), spriteLongButtons.get(1))
         ]

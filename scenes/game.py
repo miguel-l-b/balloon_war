@@ -34,7 +34,7 @@ class GameScene(Scene):
         "cloud_generator",
         (0, 0),
         zBottom,
-        [
+        script=[
           ResolverScript.getScript("cloud_generator", self, [zBottom, zBM], 4)
         ]
       )
@@ -65,6 +65,7 @@ class GameScene(Scene):
           ResolverScript.getScript(
             "player_manager",
             self,
+            0,
             100,
             {
               "up": pygame.K_w,
@@ -88,6 +89,7 @@ class GameScene(Scene):
           ResolverScript.getScript(
             "player_manager",
             self,
+            1,
             100,
             {
               "up": pygame.K_UP,

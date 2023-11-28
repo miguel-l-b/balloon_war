@@ -3,9 +3,7 @@ from pygame import *
 
 import core.types as types
 from core.entities import Entity
-from core.resolver import ResolverConfig, Logger
-
-  
+from core.resolver import ResolverConfig, Logger  
 
 class Scene(types.Scene):
   def __init__(self, screen: Surface) -> None:
@@ -25,6 +23,15 @@ class Scene(types.Scene):
   @property
   def objects(self) -> "list[Entity]":
     return self.__objects
+  
+  def onCollision(self, obj: Entity):
+    objs = []
+    for other in self.objects:
+      if obj.name != other.name:
+        if obj.z == other.z:
+          if obj.rect.colliderect(other.rect):
+            objs.append(other)
+    return objs    
 
   def get(self, name: str) -> Entity:
     for obj in self.__objects:
@@ -39,7 +46,8 @@ class Scene(types.Scene):
       Logger.log(self.__class__.__name__, "SPAWN - Object is not an Entity")
     for o in self.__objects:
       if o.name == obj.name:
-        raise Exception(f"Object with name {obj.name} already exists")
+        Logger.debug(self.__class__.__name__, f"SPAWN - Object with name {obj.name} already exists")
+        return
     Logger.debug(self.__class__.__name__, f"Spawned {obj.name}")
     self.__objects.append(obj)
   

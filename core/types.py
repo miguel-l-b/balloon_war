@@ -2,7 +2,7 @@ from abc import abstractmethod
 import pygame
 
 from enum import Enum
-from typing import NewType, TypedDict
+from typing import NewType, TypedDict, Union
 
 class TSettingsGame(TypedDict):
   debug: bool
@@ -34,20 +34,13 @@ TCoord = NewType("TCoord", "tuple[int, int]")
 TSize = NewType("TSize", "tuple[int, int]")
 TColor = NewType("TColor", "tuple[int, int, int]")
 TRect = pygame.Rect
+TMask = pygame.mask.Mask
 
 class TDimension(TypedDict):
   width: int
   height: int
   rows: int
   columns: int
-
-class EDamageType(Enum):
-  AIR = 0
-  MELLE = 1
-  FIRE = 2
-  WATER = 3
-  EARTH = 4
-  ELECTRIC = 5
 
 class Scene:
   def __init__(self, *args):
@@ -108,17 +101,36 @@ class zGroup:
   def __str__(self):
     return f"{self.__z}@{self.__name}"
   
+class Hitbox:
+  def __init__(self, rect: TRect, damage: "list[Damage]"):
+    self._rect = rect
+    self._damage = damage
+
+  @property
+  def rect(self) -> TRect:
+    return self._rect
+  
+  @property
+  def damage(self):
+    return self._damage
+  
+  def hit(self, hitbox: Union["Hitbox", TCoord]):
+    pass
+  
+  def __str__(self):
+    return f"{self._rect}@{self.__damage}"
+
 class Damage:
-  def __init__(self, damage: int, damageType: EDamageType):
+  def __init__(self, damage: int, damageType: str):
     self.__damage = damage
     self.__damageType = damageType
 
   @property
-  def damage(self):
+  def damage(self) -> int:
     return self.__damage
   
   @property
-  def damageType(self):
+  def damageType(self) -> str:
     return self.__damageType
   
   def __eq__(self, other):

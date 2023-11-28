@@ -1,84 +1,47 @@
+from typing import Union
 import pygame
 import core.types as types
-from core.resolver import ResolverPath 
 
-class HitboxSprite:
-    def __init__(self, path: str, color: "tuple[int, int, int]" = (255, 0, 0), tolerance: int = 0):
-        self.__path = ResolverPath().resolve(path)
-        self.__color = color
-        self.__tolerance = tolerance
-
-    @property
-    def path(self):
-        return self.__path
+class Hitbox(types.Hitbox):
+    def __init__(self, rect: types.TRect, damage: "list[types.Damage]" = None):
+        super().__init__(rect, damage)
     
-    @property
-    def color(self):
-        return self.__color
+    def hit(self, hitbox: Union["types.Hitbox", types.TCoord]) -> bool:
+        if isinstance(hitbox, types.Hitbox):
+            return self._rect.colliderect(hitbox.rect)
+        else:
+            return self._rect.collidepoint(hitbox)
+
+# class HitboxSprite(types.Hitbox):
+#     def __init__(self, path: str or types.TFrame, coord: types.TCoord, damage: "list[types.Damage]" = None):
+#         super().__init__(self._load(path), damage)
+
+#     def _load(self, path: str or types.TFrame):
+#         if isinstance(path, types.TFrame):
+#             self._mask = pygame.mask.from_surface((types.TFrame)(path).convert_alpha())
+#         else:
+#             self._mask = pygame.mask.from_surface(pygame.image.load(path).convert_alpha())
+#         return self._mask.get_rect()
     
-
-    @property
-    def hitbox(self) -> "list[types.TCoord]":
-        pixels = []
-        img = pygame.image.load(self.__path)
-        for x in range(img.get_width()):
-            for y in range(img.get_height()):
-                if img.get_at((x, y)) == self.__color:
-                    pixels.append((x, y))
-        return pixels
+#     @property
+#     def mask(self) -> types.TMask:
+#         return self._mask
     
-    def hit(self, coords: types.TCoord) -> bool:
-        pixels = self.hitbox
-        for i in range (len(pixels)):
-            if (coords[0] == pixels[i][0] and
-                coords[1] == pixels[i][1]
-                ): return True
-        return False
-
-    def __str__(self):
-        return f"{self.__path}@{self.__color}"
-
-
-class Hitbox:
-    def __init__(self, coords, size: tuple[int, int]):
-        self.__coords = coords
-        self.__size = size
-        self.__hitbox = pygame.Rect(self.__coords[0], self.__coords[1], self.__size[0], self.__size[1])
+#     @property
+#     def coord(self) -> types.TCoord:
+#         return self._coord
     
-    @property
-    def coords(self):
-        return self.__coords
-
-    @coords.setter
-    def coords(self, newCoords):
-        self.__coords = newCoords
-        self.__hitbox = pygame.Rect(self.__coords[0], self.__coords[1], self.__size[0], self.__size[1])
-
-    @property
-    def size(self):
-        return self.__size
-
-    @size.setter
-    def size(self, newSize):
-        self.__size = newSize
-        self.__hitbox = pygame.Rect(self.__coords[0], self.__coords[1], self.__size[0], self.__size[1])
-
-    @property
-    def hitbox(self):
-        return self.__hitbox
-
-    @hitbox.setter
-    def hitbox(self, newHitbox):
-        self.__hitbox = newHitbox
+#     @coord.setter
+#     def coord(self, newCoord: types.TCoord):
+#         self._coord = newCoord
     
-    def hit(self, coords) -> bool:
-        return (((coords[0] == self.__coords[0] - self.__size[0] or 
-                  coords[0] == self.__coords[0] + self.__size[0]) and 
-                 (coords[1] >= self.__coords[1] - self.__size[1] and 
-                  coords[1] <= self.__coords[1] + self.__size[1]))
-                or
-                ((coords[1] == self.__coords[1] + self.__size[1] or 
-                  coords[1] == self.__coords[1] - self.__size[1]) and
-                 (coords[0] >= self.__coords[0] - self.__size[0] and
-                  coords[0] <= self.__coords[0] + self.__size[0])
-                ))
+#     def hit(self, hitbox: Union["HitboxSprite", types.Hitbox, types.TCoord]) -> bool:
+#         if isinstance(hitbox, HitboxSprite):
+#             return self._mask.overlap(hitbox.mask, hitbox.coord)
+#         if isinstance(hitbox, types.Hitbox):
+#             mask = pygame.mask.from_surface(hitbox.rect)
+#             return self._mask.overlap(mask, hitbox.coord)
+#         if isinstance(hitbox, types.TCoord):
+#             other = pygame.mask.from_surface(pygame.Surface((1, 1)))
+#             return self._mask.overlap(other, hitbox)
+#         return False
