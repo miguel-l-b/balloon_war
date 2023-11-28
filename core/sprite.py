@@ -19,8 +19,8 @@ class Sprite:
     return self.__image
 
 class SpriteSlicer:
-    def __init__(self, file_name: str, dimensions: types.TDimension, stopWithSprite: int = None, resize: types.TSize = None):
-      self.__file_name = file_name
+    def __init__(self, path: str, dimensions: types.TDimension, stopWithSprite: int = None, resize: types.TSize = None):
+      self.__path = path
       self.__dimensions = dimensions
       if stopWithSprite == None:
         self.__amount = self.__dimensions["rows"] * self.__dimensions["columns"]
@@ -47,7 +47,7 @@ class SpriteSlicer:
     def size(self) -> types.TSize:
       return (self.__resize[0] or self.__dimensions["width"], self.__resize[1] or self.__dimensions["height"])
     def __load(self):
-      image = pygame.image.load(ResolverPath.resolve(self.__file_name))
+      image = pygame.image.load(ResolverPath.resolve(self.__path))
       rows = -1
       columns = -1
       for i in range(self.__amount):

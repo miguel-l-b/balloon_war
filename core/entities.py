@@ -106,6 +106,10 @@ class AnimatedSprite(Entity):
     self.__timeToStop = timeToStop
     self.__rollback = rollback
 
+  @property
+  def sprites(self) -> str:
+    return self.__sprites
+
   def update(self, screen: Surface):
     super().update(screen)
     # Atualiza o timer com base no delta
