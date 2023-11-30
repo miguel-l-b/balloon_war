@@ -52,13 +52,13 @@ class Entity:
     pass
 
   def __str__(self):
-    return f"{self.__name__}#{self._name}@{self._coords}[{self._z}]"
+    return f"{self.__class__.__name__}#{self._name}@{self._coords}[{self._z}]"
 
 
 class Text(Entity):
   def __init__(self, name: str, coords: types.TCoord, zGroup: types.zGroup, text: str, size: int = 20, color: types.TColor = (0, 0, 0), fontFamily: str = "Arial", script: "list[types.Script]" = None):
     super().__init__(name, coords, zGroup, None, script)
-    self.__text = text
+    self.text = text
     self.__size = size
     self.__color = color
     self.__fontFamily = fontFamily
@@ -69,10 +69,11 @@ class Text(Entity):
   
   def __handleText(self):
     return pygame.font.SysFont(self.__fontFamily, self.__size).render(self.__text, True, self.__color)
+  
   @text.setter
   def text(self, newText: str):
     self.__text = newText
-    self._hitbox = Hitbox(self.__handleText())
+    self._rect = self.__handleText().get_rect()
 
   def update(self, screen: Surface):
     super().update(screen)
@@ -105,6 +106,7 @@ class AnimatedSprite(Entity):
   def __init__(self, name: str, coords: types.TCoord, zGroup: types.zGroup, sprites: SpriteSlicer, fps: int = 10, loop: bool = True, stopWithSprite: int = None, timeToStop: int = None, rollback: bool = False, hitbox: types.Hitbox = None, script: "list[types.Script]" = None):
     super().__init__(name, coords, zGroup, hitbox, script)
     self.__sprites = sprites.getAll()
+    self._rect = self.__sprites[0].get_rect()
     self.__fps = fps
     self.__currentSprite = 0
     self.__timer = 0
