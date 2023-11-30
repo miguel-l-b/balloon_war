@@ -25,6 +25,8 @@ class DartMove(types.Script):
     self._velocity = self.calculateInercie(self._velocity, self._speed, delta_time)
     self._owner.moving((self._velocity, self._gravity * delta_time))
 
-    print(self._owner.coords[0])
-    if self._owner.coords[0] < 0 or self._owner.coords[0] > self._limits[0]:
-      self._scene.kill(self._owner)
+    if self._owner.coords[0] < -70 or self._owner.coords[0] > self._limits[0]:
+      self._scene.kill(self._owner.name)
+
+    if self._owner.coords[1] < -70 or self._owner.coords[1] > self._limits[1]:
+      self._scene.kill(self._owner.name)

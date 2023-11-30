@@ -13,13 +13,14 @@ class TKeys(TypedDict):
     reload: int
 
 class PlayerManager(types.Script):
-    def __init__(self, scene: Scene, num: int, speed: int, keys: TKeys, gravity: float):
+    def __init__(self, scene: Scene, num: int, speed: int, keys: TKeys, gravity: float, maxHP: int):
         super().__init__()
         self._num = num
         self._scene = scene
         self._speed = speed
         self._keys = keys
         self._gravity = gravity
+        self._maxHP = maxHP
 
     def setup(self, owner: AnimatedSprite):
         self._owner = owner
@@ -34,6 +35,16 @@ class PlayerManager(types.Script):
             2,
             (70, 70)
         )
+        self._heartSprite = SpriteSlicer(
+            "@sprites/heart.png",
+            {
+                "width": 25,
+                "height": 25,
+                "rows": 3,
+                "columns": 1
+            },
+            3
+        )
         self._limits = ResolverCoords.getSizeScreen()
         self._ammunition = 10
         self._timer = 0
@@ -42,6 +53,31 @@ class PlayerManager(types.Script):
         self._shotIn = 0
         self._reloadIn = 0
         self._reloaded = False
+        self._hp = self._maxHP
+        self.handleHP()
+
+    def handleHP(self):
+        for i in range(0, self._hp):
+            self._scene.spawn(
+                Sprite(
+                    f"hp-{i}#{self._num}",
+                    (self._owner.coords[0]+(30*i), 50),
+                    self._owner.z,
+                    self._heartSprite.get(0),
+                    hitbox=Hitbox(self._heartSprite.get(0).get_rect()),
+                )
+            )
+        for i in range(self._hp, self._maxHP):
+            self._scene.kill(f"hp-{i}#{self._num}")
+            self._scene.spawn(
+                Sprite(
+                    f"hp-{i}#{self._num}_ded",
+                    (self._owner.coords[0]+(30*i), 50),
+                    self._owner.z,
+                    self._heartSprite.get(2),
+                    hitbox=Hitbox(self._heartSprite.get(2).get_rect()),
+                )
+            )
 
     def calculateInercie(self, oldVelocity: float, increment: float, delta_time: float):
         return oldVelocity + (increment * delta_time)
@@ -76,7 +112,6 @@ class PlayerManager(types.Script):
                 )
             )
             self._ammunition = self._ammunition - 1
-            print(self._ammunition)
 
         
         elif pygame.key.get_pressed()[self._keys["reload"]] and self._ammunition == 0:
@@ -87,4 +122,17 @@ class PlayerManager(types.Script):
             self._reloaded = False
             self._ammunition = 10
 
+
+        if self._owner.coords[1] >= 0 and self._owner.coords[1] >= self._limits[1]:
+            self._owner.moving((0, -self._owner.coords[1]))
+            self._velocity = 0
+            self._hp -= 1
+
+        for obj in self._scene.onCollision(self._owner):
+            if obj.name.startswith("dart") and obj.name.split("#")[1] != str(self._num):
+                self._hp = self._hp - 1
+                self._scene.kill(obj.name)
+                self.handleHP()
+
         self._owner.moving((0, self._velocity * delta_time))
+        self.handleHP()
