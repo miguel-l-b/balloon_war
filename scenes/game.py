@@ -2,7 +2,7 @@ import pygame
 from pygame import *
 from pygame.locals import *
 from core.entities import *
-from core.resolver import ResolverConfig, ResolverCoords, ResolverPath, ResolverScript
+from core.resolver import ResolverConfig, ResolverCoords, ResolverPath, ResolverScript, ResolverVolume
 from core.scene import Scene
 from core.sprite import SpriteSlicer
 
@@ -54,59 +54,59 @@ class GameScene(Scene):
       )
     )
 
-    # self.spawn(
-    #   AnimatedSprite(
-    #     "player_0",
-    #     ResolverCoords.getCoordsWithCenterY(ResolverCoords.getSizeScreen(), (5, 40)),
-    #     zMedium,
-    #     sprite_cyan,
-    #     fps=15,
-    #     script=[
-    #       ResolverScript.getScript(
-    #         "player_manager",
-    #         self,
-    #         0,
-    #         100,
-    #         {
-    #           "up": pygame.K_w,
-    #           "shoot": pygame.K_d,
-    #           "reload": pygame.K_a
-    #         },
-    #         80,
-    #         3
-    #       )
-    #     ]
-    #   )
-    # )
+    self.spawn(
+      AnimatedSprite(
+        "player_0",
+        ResolverCoords.getCoordsWithCenterY(ResolverCoords.getSizeScreen(), (5, 40)),
+        zMedium,
+        sprite_cyan,
+        fps=15,
+        script=[
+          ResolverScript.getScript(
+            "player_manager",
+            self,
+            0,
+            100,
+            {
+              "up": pygame.K_w,
+              "shoot": pygame.K_d,
+              "reload": pygame.K_a
+            },
+            80,
+            3
+          )
+        ]
+      )
+    )
 
-    # self.spawn(
-    #   AnimatedSprite(
-    #     "player_1",
-    #     ResolverCoords.getCoordsWithCenterY(ResolverCoords.getSizeScreen(), (ResolverCoords.getSizeScreen()[0]-85, 40)),
-    #     zMedium,
-    #     sprite_orange,
-    #     fps=15,
-    #     script=[
-    #       ResolverScript.getScript(
-    #         "player_manager",
-    #         self,
-    #         1,
-    #         100,
-    #         {
-    #           "up": pygame.K_UP,
-    #           "shoot": pygame.K_LEFT,
-    #           "reload": pygame.K_RIGHT
-    #         },
-    #         80,
-    #         3
-    #       )
-    #     ]
-    #   )
-    # )
+    self.spawn(
+      AnimatedSprite(
+        "player_1",
+        ResolverCoords.getCoordsWithCenterY(ResolverCoords.getSizeScreen(), (ResolverCoords.getSizeScreen()[0]-85, 40)),
+        zMedium,
+        sprite_orange,
+        fps=15,
+        script=[
+          ResolverScript.getScript(
+            "player_manager",
+            self,
+            1,
+            100,
+            {
+              "up": pygame.K_UP,
+              "shoot": pygame.K_LEFT,
+              "reload": pygame.K_RIGHT
+            },
+            80,
+            3
+          )
+        ]
+      )
+    )
 
     self._backgroundColor = ResolverConfig.resolve()["game"]["colors"]["cyan"]
   def start(self):
     pygame.mixer.music.load(ResolverPath.resolve("@audio/music/retro_music_in_game.wav"))
-    pygame.mixer.music.set_volume(ResolverConfig.resolve()["game"]["volume"])
+    pygame.mixer.music.set_volume(ResolverVolume.handleVolume("music"))
     pygame.mixer.music.play(loops=-1)
     super().start()

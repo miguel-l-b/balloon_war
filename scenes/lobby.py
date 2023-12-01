@@ -2,7 +2,7 @@ import pygame
 from pygame import *
 from pygame.locals import *
 from core.entities import *
-from core.resolver import ResolverConfig, ResolverCoords, ResolverPath, ResolverScript
+from core.resolver import ResolverConfig, ResolverCoords, ResolverPath, ResolverScript, ResolverVolume
 from core.scene import Scene
 from core.sprite import SpriteSlicer
 
@@ -78,6 +78,6 @@ class LobbyScene(Scene):
     self._backgroundColor = ResolverConfig.resolve()["game"]["colors"]["cyan"]
   def start(self):
     pygame.mixer.music.load(ResolverPath.resolve("@audio/music/bloodpixelhero_game_music_loop.wav"))
-    pygame.mixer.music.set_volume(ResolverConfig.resolve()["game"]["volume"])
+    pygame.mixer.music.set_volume(ResolverVolume.handleVolume("music"))
     pygame.mixer.music.play(loops=-1)
     super().start()
