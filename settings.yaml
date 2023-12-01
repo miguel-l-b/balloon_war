@@ -28,4 +28,7 @@ game:
     purple:  !!python/tuple [128, 0, 128]
     pink:    !!python/tuple [255, 192, 203]
     cyan:    !!python/tuple [0, 255, 255]
-  volume:    0.05
+  volume:
+    music: 0.8
+    effects: 0.4
+    geral: 0.2

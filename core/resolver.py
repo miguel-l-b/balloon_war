@@ -31,6 +31,19 @@ class ResolverConfig:
         settings = settings[keys[i]]
     ResolverFile.writeYaml(f"{ResolverPath.getLocalPath()}/settings.yaml", ResolverConfig.resolve())
 
+class ResolverVolume:
+  @staticmethod
+  def calcVolumeToGeneral(volume: float) -> float:
+    return float(volume * ResolverConfig.resolve()["game"]["volume"]["geral"])
+  @staticmethod
+  def handleVolume(type: str) -> int:
+    if type == "music":
+      return ResolverVolume.calcVolumeToGeneral(ResolverConfig.resolve()["game"]["volume"]["music"])
+    elif type == "effects":
+      return ResolverVolume.calcVolumeToGeneral(ResolverConfig.resolve()["game"]["volume"]["effects"])
+    else:
+      raise Exception("Volume type not found")
+
 class ResolverScript:
   def __init__(self):
     pass
@@ -276,7 +289,7 @@ class ResolverScene:
     except ImportError:
       Logger.debug("sceneLoader", (f"Não foi possível importar o módulo {name} de {path}."))
     except AttributeError:
-      Logger.debug("sceneLoader", (f"A classe {name} não foi encontrada no módulo {path}."))
+      Logger.debug("sceneLoader", (f"A classe {class_name} não foi encontrada no módulo {path}."))
 
   @staticmethod
   def __convert_to_class_name(file_name):
@@ -306,23 +319,23 @@ class ManagerScenes:
   def setCurrent(self, scene: types.Scene):
     self.__current_scene = scene
 
-  def goTo(self, name: str):
+  def goTo(self, name: str, *data):
     if self.__scenes_resolver.isExist(name):
       old = self.__current_scene
       self.__current_scene = self.__scenes_resolver.getByName(name)
       if old is not None:
         old.stop()
         self.__historic.append(old)
-      self.__current_scene.start()
+      self.__current_scene.start(*data)
       Logger.debug("sceneLoader", f"Scene {name} started")
       Logger.debug("sceneLoader", f"Scene {old} stopped")
     else:
       Logger.debug("sceneLoader", f"Scene {name} not found")
   
-  def goToBack(self):
+  def goToBack(self, *data):
     self.__historic.pop()
-    self.goTo(self.__historic.pop())
+    self.goTo(self.__historic.pop().__class__.__name__, *data)
   
-  def goToBackAndGoTo(self, name: str):
+  def goToBackAndGoTo(self, name: str, *data):
     self.__historic.pop()
-    self.goTo(name)
+    self.goTo(name, *data)
