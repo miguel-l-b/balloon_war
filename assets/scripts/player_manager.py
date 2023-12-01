@@ -1,7 +1,7 @@
 from typing import TypedDict
 import pygame
 from core.hitbox import Hitbox
-from core.resolver import ResolverCoords, ResolverScript
+from core.resolver import ManagerScenes, ResolverCoords, ResolverScript
 from core.sprite import SpriteSlicer 
 import core.types as types
 from core.scene import Scene
@@ -133,6 +133,9 @@ class PlayerManager(types.Script):
                 self._hp = self._hp - 1
                 self._scene.kill(obj.name)
                 self.handleHP()
+
+        if self._hp == 0:
+            ManagerScenes.goTo("game_over", f"Player s{self._num}")
 
         self._owner.moving((0, self._velocity * delta_time))
         self.handleHP()
