@@ -58,10 +58,10 @@ class Entity:
 class Text(Entity):
   def __init__(self, name: str, coords: types.TCoord, zGroup: types.zGroup, text: str, size: int = 20, color: types.TColor = (0, 0, 0), fontFamily: str = "Arial", script: "list[types.Script]" = None):
     super().__init__(name, coords, zGroup, None, script)
-    self.text = text
     self.__size = size
     self.__color = color
     self.__fontFamily = fontFamily
+    self.text = text
   
   @property
   def text(self):
@@ -74,7 +74,6 @@ class Text(Entity):
   def text(self, newText: str):
     self.__text = newText
     self._rect = self.__handleText().get_rect()
-
   def update(self, screen: Surface):
     super().update(screen)
     screen.blit(self.__handleText(), self._coords)
