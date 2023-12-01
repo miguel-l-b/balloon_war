@@ -4,12 +4,18 @@ import pygame
 from enum import Enum
 from typing import NewType, TypedDict, Union
 
+class TSettingsGameVolume(TypedDict):
+  music: float
+  effects: float
+  geral: float
+
 class TSettingsGame(TypedDict):
   debug: bool
   frameRate: int
   loadScene: str
   mainScene: str
   colors: "dict[str, tuple[int, int, int]]"
+  volume: TSettingsGameVolume
 class TSettingsWindow(TypedDict):
   title: str
   dimension: "tuple[int, int]"
