@@ -1,11 +1,11 @@
 from typing import TypedDict
 import pygame
 from core.hitbox import Hitbox
-from core.resolver import ManagerScenes, ResolverCoords, ResolverScript
+from core.resolver import ManagerScenes, ResolverCoords, ResolverPath, ResolverScript, ResolverVolume
 from core.sprite import SpriteSlicer 
 import core.types as types
 from core.scene import Scene
-from core.entities import AnimatedSprite, Sprite
+from core.entities import AnimatedSprite, Sprite, Text
 
 class TKeys(TypedDict):
     up: int
@@ -54,6 +54,19 @@ class PlayerManager(types.Script):
         self._reloadIn = 0
         self._reloaded = False
         self._hp = self._maxHP
+        self._effect_hit = pygame.mixer.Sound(ResolverPath.resolve("@audio/effect/balloon_hit.mp3"))
+        self._effect_arrow = pygame.mixer.Sound(ResolverPath.resolve("@audio/effect/bow_fire_arrow.mp3"))
+        self._effect_hit.set_volume(ResolverVolume.handleVolume("effects")*1.2)
+        self._effect_arrow.set_volume(ResolverVolume.handleVolume("effects"))
+        self._textAmunition = Text(
+            f"ammunition#{self._num}",
+            (self._owner.coords[0]+(80 if self._num == 0 else -80), 100),
+            self._owner.z,
+            f"{self._ammunition}",
+            20,
+            (255, 255, 255),
+        )
+        self._scene.spawn(self._textAmunition)
         self.handleHP()
 
     def handleHP(self):
@@ -111,6 +124,7 @@ class PlayerManager(types.Script):
                     ]
                 )
             )
+            self._effect_arrow.play()
             self._ammunition = self._ammunition - 1
 
         
@@ -126,16 +140,20 @@ class PlayerManager(types.Script):
         if self._owner.coords[1] >= 0 and self._owner.coords[1] >= self._limits[1]:
             self._owner.moving((0, -self._owner.coords[1]))
             self._velocity = 0
+            self._effect_hit.play()
             self._hp -= 1
 
         for obj in self._scene.onCollision(self._owner):
             if obj.name.startswith("dart") and obj.name.split("#")[1] != str(self._num):
                 self._hp = self._hp - 1
+                self._effect_hit.play()
                 self._scene.kill(obj.name)
                 self.handleHP()
 
         if self._hp == 0:
-            ManagerScenes.goTo("game_over", f"Player s{self._num}")
+            pygame.mixer.music.stop()
+            ManagerScenes().goTo("game_over", f"Player {self._num}")
 
+        self._textAmunition.text = f"{self._ammunition}"
         self._owner.moving((0, self._velocity * delta_time))
         self.handleHP()
