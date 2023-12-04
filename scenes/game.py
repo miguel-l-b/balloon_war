@@ -2,7 +2,7 @@ import pygame
 from pygame import *
 from pygame.locals import *
 from core.entities import *
-from core.resolver import ResolverConfig, ResolverCoords, ResolverPath, ResolverScript, ResolverVolume
+from core.resolver import ManagerScenes, ResolverConfig, ResolverCoords, ResolverPath, ResolverScript, ResolverVolume
 from core.scene import Scene
 from core.sprite import SpriteSlicer
 
@@ -109,4 +109,5 @@ class GameScene(Scene):
     pygame.mixer.music.load(ResolverPath.resolve("@audio/music/retro_music_in_game.wav"))
     pygame.mixer.music.set_volume(ResolverVolume.handleVolume("music"))
     pygame.mixer.music.play(loops=-1)
+    ManagerScenes().rebuild("game_over")
     super().start()

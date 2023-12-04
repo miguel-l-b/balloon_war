@@ -72,7 +72,7 @@ class Scene:
     pass
 
   def __str__(self):
-    return f"{self.__name__}#{self.__name}@{self.__objects}"
+    return f"{self.__class__.__name__}"
 
 class zGroup:
   def __init__(self, z: int, name: str):

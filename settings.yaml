@@ -13,7 +13,7 @@ paths:
   logger:  logs
 # settings of game
 game:
-  debug:     true
+  debug:     false
   frameRate: 60
   loadScene: load
   mainScene: lobby

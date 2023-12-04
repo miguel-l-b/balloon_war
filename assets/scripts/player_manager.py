@@ -152,7 +152,7 @@ class PlayerManager(types.Script):
 
         if self._hp == 0:
             pygame.mixer.music.stop()
-            ManagerScenes().goTo("game_over", f"Player {self._num}")
+            ManagerScenes().goTo("game_over", self._num)
 
         self._textAmunition.text = f"{self._ammunition}"
         self._owner.moving((0, self._velocity * delta_time))

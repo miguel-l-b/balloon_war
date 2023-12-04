@@ -1,6 +1,7 @@
 import datetime
 import importlib.util
 import random
+import threading
 import yaml
 import os
 import core.types as types
@@ -223,7 +224,7 @@ class ResolverFile:
 class Logger:
   @staticmethod
   def debug(location: str, message: str):
-    if ResolverConfig.resolve()["game"]["debug"]:
+    if ResolverConfig.resolve()["game"]["debug"] is True:
       ResolverFile.append(f"@logger/{location}.log", f"[{datetime.datetime.now()}] - {message}\n")
 
   @staticmethod
@@ -271,6 +272,14 @@ class ResolverScene:
       if scene.__class__.__name__ == class_name:
         return scene
     raise Exception(f"Scene {class_name} not found")
+  
+  def rebuild(self, name: str) -> bool:
+    class_name = ResolverScene.__convert_to_class_name(name)
+    for i in range(len(self.__scenes)):
+      if self.__scenes[i].__class__.__name__ == class_name:
+        self.__scenes[i] = ResolverScene.handleScene(name, *self.__args)
+        return True
+    return False
 
   @staticmethod
   def handleScene(name: str, *args) -> types.Scene:
@@ -319,19 +328,41 @@ class ManagerScenes:
   def setCurrent(self, scene: types.Scene):
     self.__current_scene = scene
 
+  @staticmethod
+  def __start_scene_safely(scene: types.Scene, *data):
+    try:
+      scene.start(*data)
+    except Exception as e:
+      Logger.debug("sceneLoader", f"Scene {scene} error on start -> {e}")
+
   def goTo(self, name: str, *data):
     if self.__scenes_resolver.isExist(name):
       old = self.__current_scene
       self.__current_scene = self.__scenes_resolver.getByName(name)
+      thread = threading.Thread(target=lambda: ManagerScenes.__start_scene_safely(self.__current_scene, *data), name=self.__current_scene.__class__.__name__)
+      thread.start()
       if old is not None:
         old.stop()
         self.__historic.append(old)
-      self.__current_scene.start(*data)
+        Logger.debug("sceneLoader", f"Scene {old} stopped")
       Logger.debug("sceneLoader", f"Scene {name} started")
-      Logger.debug("sceneLoader", f"Scene {old} stopped")
     else:
       Logger.debug("sceneLoader", f"Scene {name} not found")
+    thread.join()
+
   
+  def rebuild(self, name: str):
+    if not self.__scenes_resolver.rebuild(name):
+      Logger.debug("sceneLoader", f"Scene {name} not found")
+
+  def reload(self, *data):
+    try:
+      self.__current_scene.stop()
+      self.__current_scene.start(*data)
+      Logger.debug("sceneLoader", f"Scene {self.__current_scene.__class__.__name__} reloaded")
+    except:
+      Logger.debug("sceneLoader", f"Scene {self.__current_scene.__class__.__name__} error on reload")
+
   def goToBack(self, *data):
     self.__historic.pop()
     self.goTo(self.__historic.pop().__class__.__name__, *data)
