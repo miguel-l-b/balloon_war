@@ -339,8 +339,9 @@ class ManagerScenes:
     if self.__scenes_resolver.isExist(name):
       old = self.__current_scene
       self.__current_scene = self.__scenes_resolver.getByName(name)
-      thread = threading.Thread(target=lambda: ManagerScenes.__start_scene_safely(self.__current_scene, *data), name=self.__current_scene.__class__.__name__)
-      thread.start()
+      self.__current_scene.start(*data)
+      # thread = threading.Thread(target=lambda: ManagerScenes.__start_scene_safely(self.__current_scene, *data), name=self.__current_scene.__class__.__name__)
+      # thread.start()
       if old is not None:
         old.stop()
         self.__historic.append(old)
@@ -348,7 +349,7 @@ class ManagerScenes:
       Logger.debug("sceneLoader", f"Scene {name} started")
     else:
       Logger.debug("sceneLoader", f"Scene {name} not found")
-    thread.join()
+    # thread.join()
 
   
   def rebuild(self, name: str):
